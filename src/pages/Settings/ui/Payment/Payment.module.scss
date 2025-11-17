@@ -1,0 +1,28 @@
+.payment {
+  & > h3 {
+    margin-bottom: 48px;
+    margin-top: 24px;
+    padding-left: 4px;
+  }
+  .cell__hash,
+  .row__index {
+    height: 64px;
+    width: 64px;
+    text-align: center;
+    font-size: 25px;
+  }
+  .row__index {
+    color: #64748b;
+  }
+  .method__title {
+    text-align: start;
+    padding-left: 36px;
+  }
+  .status__title {
+    width: 134px;
+  }
+  .payment__method {
+    color: #0f1c3d;
+    padding-left: 48px;
+  }
+}

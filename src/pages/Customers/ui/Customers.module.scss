@@ -1,0 +1,107 @@
+.customers {
+  position: relative;
+  height: calc(100% - 32px);
+  flex: 1;
+  padding: 32px;
+  padding-bottom: 28px;
+  margin: 12px 12px 12px 0;
+
+  .customers__header {
+    display: flex;
+    gap: 12px;
+    height: 64px;
+    margin-top: 22px;
+    .customers__calendar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 360px;
+      height: 100%;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      .dropdown__calendar {
+        cursor: default;
+        width: 390px;
+        // height: 430px;
+        position: absolute;
+        top: calc(100% + 16px);
+        right: 16px;
+        border-radius: 24px;
+        border: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+        box-shadow: 0px 0px 12px 0px #1e1e1e14;
+
+        padding: 18px 28px 24px 28px;
+
+        opacity: 0;
+        pointer-events: none;
+        z-index: -999;
+        transition: opacity 0.3s;
+        &.open {
+          transition: opacity 0.3s;
+
+          opacity: 1;
+          pointer-events: all;
+          z-index: 100;
+        }
+      }
+      svg {
+        height: 32px;
+        width: 32px;
+      }
+      .title {
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 100%;
+        color: #94a3b8;
+      }
+    }
+  }
+  .empty {
+    margin-top: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .checkbox_btn {
+    width: 64px;
+    height: 64px;
+    cursor: pointer;
+  }
+
+  .cell__hash,
+  .row__index {
+    width: 64px;
+    height: 64px;
+    font-size: 25px;
+    text-align: center;
+  }
+
+  .product__count {
+    text-align: center;
+    color: #64748b;
+  }
+
+  .total__sale {
+    padding-left: 48px;
+    font-weight: 500;
+    font-size: 20px;
+    color: #0f1c3d;
+  }
+
+  .message__btn,
+  .thead__more {
+    width: 64px;
+    height: 64px;
+    cursor: pointer;
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+}

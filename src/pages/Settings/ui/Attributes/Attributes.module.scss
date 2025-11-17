@@ -1,0 +1,218 @@
+.attributes {
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #0f1c3d;
+  }
+}
+
+.attributesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.attributeCard {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.attributeHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .attributeTitleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #0f1c3d;
+  }
+
+  .expandButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #64748b;
+    padding: 4px 8px;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #0f1c3d;
+    }
+  }
+
+  .slug {
+    font-size: 14px;
+    color: #94a3b8;
+  }
+
+  .filterableBadge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 4px;
+    font-size: 12px;
+    width: fit-content;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #475569;
+  }
+
+  input[type="text"] {
+    height: 48px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+
+    &:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+  }
+}
+
+.checkboxGroup {
+  margin-top: 16px;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    span {
+      font-size: 16px;
+      color: #0f1c3d;
+    }
+  }
+}
+
+.valuesSection {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.valuesSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  h4 {
+    font-size: 16px;
+    font-weight: 500;
+    color: #475569;
+  }
+}
+
+.addValueButton {
+  padding: 6px 12px;
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  color: #475569;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+  }
+}
+
+.valuesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.valueItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+.valueInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.valueName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f1c3d;
+}
+
+.valueSlug {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.deleteValueButton {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #dc2626;
+  }
+}
+
+.loading,
+.emptyValues {
+  padding: 16px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 14px;
+}

@@ -1,0 +1,55 @@
+.sizes__wrapper {
+  position: relative;
+  height: 100%;
+  & > h3 {
+    margin-top: 24px;
+    padding-left: 4px;
+    padding-bottom: 24px;
+  }
+
+  .empty {
+    margin-top: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .validation__error {
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 100%;
+    color: #fb2c36;
+    margin: 12px 0 0 12px;
+  }
+
+  .cell__hash,
+  .row__index {
+    height: 64px;
+    width: 64px;
+    text-align: center;
+    font-size: 25px;
+  }
+
+  .sizes__title {
+    text-align: start;
+    padding-left: 36px;
+  }
+  .sizes {
+    color: #0f1c3d;
+    padding-left: 48px;
+  }
+
+  .row__index {
+    color: #64748b;
+  }
+
+  .thead__more,
+  .edit__btn,
+  .hide__btn {
+    text-align: center;
+    height: 64px;
+    width: 64px;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,207 @@
+.sidebar {
+  height: 100%;
+  width: 288px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: width 0.4s;
+  margin-left: 12px;
+  padding: 12px 0;
+  user-select: none;
+  .logo__title,
+  .nav__title,
+  .logout__title,
+  .profile__info,
+  .close_btn {
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity 0.2s;
+    visibility: visible;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 108px;
+
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: opacity 0.1s;
+    overflow: hidden;
+    &:active {
+      transform: scale(0.96);
+    }
+    &_img {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-left: 38px;
+
+      & > svg {
+        height: 48px;
+        width: 48px;
+      }
+    }
+    &__title {
+      font-weight: 500;
+      font-size: 25px;
+      line-height: 100%;
+    }
+    .close_btn {
+      height: 100%;
+      // min-height: 106px;
+      width: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background-color: transparent;
+      transition: opacity 0.1s;
+    }
+  }
+  &__inner {
+    position: relative;
+    display: flex;
+
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    border-radius: 24px;
+    outline: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    padding: 20px;
+
+    .nav_list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 16px;
+        width: 100%;
+        height: 64px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        padding: 14px 24px;
+
+        &.active {
+          background-color: #fff;
+          .nav__title {
+            color: #8e51ff;
+          }
+        }
+        &:hover {
+          background-color: #fff;
+          transition: background-color 0.3s;
+        }
+        &:active {
+          transform: scale(0.96);
+        }
+
+        .nav__icon {
+          display: flex;
+          svg {
+            height: 36px;
+            width: 36px;
+          }
+        }
+        .nav__title {
+          font-weight: 400;
+          font-size: 20px;
+          line-height: 100%;
+          color: #94a3b8;
+        }
+      }
+    }
+    .logout_btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      background-color: transparent;
+      padding: 14px 24px;
+      border-radius: 16px;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #fff;
+        transition: background-color 0.3s;
+      }
+      svg {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+      }
+      p {
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 100%;
+        color: #94a3b8;
+      }
+    }
+  }
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background-color: #f8fafc;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    padding: 16px 30px;
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.96);
+    }
+    img {
+      width: 64px;
+      height: 64px;
+    }
+
+    &__info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      p {
+        line-height: 100%;
+      }
+    }
+    &__role {
+      font-weight: 400;
+      font-size: 16px;
+
+      color: #64748b;
+    }
+    &__name {
+      font-weight: 500;
+      font-size: 24px;
+
+      color: #333;
+    }
+  }
+
+  &.close {
+    .logo__title,
+    .nav__title,
+    .logout__title,
+    .profile__info,
+    .close_btn {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      visibility: hidden;
+      z-index: -1;
+      position: absolute;
+    }
+
+    transition: width 0.4s;
+    width: 124px;
+  }
+}

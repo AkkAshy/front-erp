@@ -1,0 +1,67 @@
+.main__settings {
+  flex: 1;
+  & > h3 {
+    margin-top: 24px;
+    padding-left: 4px;
+  }
+
+  .theme__methods {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+
+    border: 1.5px solid #e2e8f0;
+    background-color: #f8fafc;
+    border-radius: 24px;
+    padding: 32px 32px 20px 32px;
+    .item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      .img {
+        display: flex;
+        // overflow: hidden;
+        border-radius: 32px;
+        svg {
+          height: 100%;
+          width: 100%;
+        }
+      }
+      &.selected {
+        .img {
+          outline: 2px solid #8e51ff;
+          svg {
+            border: none;
+            border-radius: 32px;
+          }
+        }
+
+        .icon {
+          background-color: #8e51ff0a;
+          svg {
+            path {
+              stroke: #8e51ff;
+            }
+          }
+        }
+      }
+
+      .icon {
+        margin-top: 16px;
+        height: 80px;
+        width: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+
+        svg {
+          height: 48px;
+          width: 48px;
+        }
+      }
+    }
+  }
+}

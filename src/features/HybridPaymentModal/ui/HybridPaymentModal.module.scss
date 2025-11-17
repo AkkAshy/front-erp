@@ -1,0 +1,129 @@
+.container {
+  padding: 20px 0;
+}
+
+.totalInfo {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+
+  .infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    span {
+      font-size: 14px;
+      color: #666;
+    }
+
+    strong {
+      font-size: 16px;
+      color: #000;
+
+      &.error {
+        color: #ff4d4f;
+      }
+    }
+  }
+}
+
+.paymentMethods {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.methodItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .methodHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    span {
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  .input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: #8e51ff;
+    }
+
+    &::placeholder {
+      color: #999;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+
+  button {
+    flex: 1;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btnCancel {
+    background-color: #f5f5f5;
+    color: #333;
+
+    &:hover:not(:disabled) {
+      background-color: #e0e0e0;
+    }
+  }
+
+  .btnConfirm {
+    background-color: #8e51ff;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #7a3ede;
+    }
+  }
+}

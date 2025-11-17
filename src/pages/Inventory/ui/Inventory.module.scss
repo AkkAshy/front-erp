@@ -1,0 +1,116 @@
+.inventory {
+  position: relative;
+
+  margin: 12px;
+  margin-left: 0;
+  padding: 32px;
+  height: calc(100% - 32px);
+  display: flex;
+  flex-direction: column;
+
+  h1 {
+    margin-top: 8px;
+  }
+  .action__btns {
+    display: flex;
+    gap: 34px;
+  }
+  .filter__wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 64px;
+    margin-top: 24px;
+  }
+  
+  .empty {
+    margin-top: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .inventory__pagination {
+    width: calc(100% - 64px);
+    height: 44px;
+    position: absolute;
+    bottom: 30px;
+    // border: 1px solid red;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sizes__list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    padding: 0 10px;
+    .item {
+      .size__title {
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 100%;
+        margin-left: 8px;
+        margin-bottom: 16px;
+        color: #475569;
+      }
+      .size__count {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        height: 64px;
+        width: 100%;
+        border-radius: 16px;
+
+        font-weight: 500;
+        font-size: 18px;
+        line-height: 100%;
+
+        color: #0f1c3d;
+        border: 1px solid #e2e8f0;
+        background-color: #fff;
+      }
+    }
+  }
+  .cell__hash,
+  .row__index {
+    height: 64px;
+    width: 64px;
+    text-align: center;
+    font-size: 25px;
+  }
+  .row__index {
+    color: #64748b;
+  }
+  .sizes__heading {
+    color: #0f1c3d;
+    text-align: center;
+  }
+  .product__title {
+    padding-left: 48px;
+    font-size: 22px;
+    color: #0f1c3d;
+  }
+  .product__count {
+    text-align: center;
+    color: #64748b;
+  }
+  .product__price {
+    text-align: center;
+
+    color: #0f1c3d;
+  }
+  .thead__more,
+  .edit__btn,
+  .delete__btn {
+    height: 64px;
+    width: 64px;
+    cursor: pointer;
+    text-align: center;
+    svg {
+      height: 28px;
+      width: 28px;
+    }
+  }
+}

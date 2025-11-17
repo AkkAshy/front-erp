@@ -1,0 +1,106 @@
+.seller {
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+    margin-bottom: 48px;
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .text {
+        font-weight: 400;
+        font-size: 24px;
+        line-height: 100%;
+        color: #475569;
+      }
+    }
+    h3 {
+      margin-left: 4px;
+    }
+  }
+  .empty {
+    margin-top: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .label__input {
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 100%;
+    margin: 24px 0 16px 8px;
+    color: #475569;
+  }
+  .validation__error {
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 100%;
+    color: #fb2c36;
+    margin: 12px 0 0 12px;
+  }
+
+  .form__wrapper {
+    display: flex;
+    gap: 24px;
+    .input__wrapper {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      .password {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        border: 1px solid #e2e8f0;
+        background-color: #fff;
+        border-radius: 16px;
+        .password__icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          width: 64px;
+          cursor: pointer;
+          border-radius: 16px;
+        }
+        input {
+          height: 100%;
+          border: none;
+        }
+      }
+    }
+  }
+
+  .cell__hash,
+  .row__index {
+    height: 64px;
+    width: 64px;
+    text-align: center;
+    font-size: 25px;
+  }
+  .row__index {
+    color: #64748b;
+  }
+
+  .seller__title {
+    // color: #0f1c3d;
+    padding-left: 48px;
+  }
+  .seller__phone {
+    // color: #0f1c3d;
+    padding-left: 48px;
+  }
+
+  .thead__more,
+  .edit__btn,
+  .delete__btn {
+    text-align: center;
+    height: 64px;
+    width: 64px;
+    cursor: pointer;
+  }
+}

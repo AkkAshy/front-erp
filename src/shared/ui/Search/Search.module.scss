@@ -1,0 +1,29 @@
+.search__wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  gap: 16px;
+  padding: 0px 19px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  svg {
+    width: 30px;
+    height: 30px;
+    flex-wrap: nowrap;
+  }
+  input {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    border: none;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 100%;
+    background-color: transparent;
+    &::placeholder {
+      color: #94a3b8;
+    }
+  }
+}

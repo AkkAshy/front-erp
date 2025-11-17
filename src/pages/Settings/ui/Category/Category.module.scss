@@ -1,0 +1,95 @@
+.category {
+  position: relative;
+  height: calc(100% - 32px);
+
+  .empty {
+    margin-top: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .validation__error {
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 100%;
+    color: #fb2c36;
+    margin: 12px 0 0 12px;
+  }
+
+  .attributesSection {
+    margin-top: 20px;
+
+    label {
+      display: block;
+      font-size: 16px;
+      font-weight: 500;
+      color: #0f1c3d;
+      margin-bottom: 12px;
+    }
+  }
+
+  .attributesList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+  }
+
+  .checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    span {
+      font-size: 14px;
+      color: #0f1c3d;
+    }
+  }
+
+  & > h3 {
+    margin-top: 24px;
+    padding-left: 4px;
+    padding-bottom: 24px;
+  }
+
+  .cell__hash,
+  .row__index {
+    height: 64px;
+    width: 64px;
+    text-align: center;
+    font-size: 25px;
+  }
+  .row__index {
+    color: #64748b;
+  }
+  .product__title {
+    padding-left: 48px;
+    font-size: 20px;
+    color: #0f1c3d;
+  }
+  .thead__more,
+  .edit__btn,
+  .hide__btn {
+    height: 64px;
+    width: 64px;
+    cursor: pointer;
+    text-align: center;
+    svg {
+      height: 28px;
+      width: 28px;
+    }
+  }
+}

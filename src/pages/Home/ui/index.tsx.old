@@ -1,0 +1,677 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Table from "@/shared/ui/Table";
+import PageTitle from "@/shared/ui/PageTitle";
+import CreateModal from "@/shared/ui/CreateModal";
+
+import DeleteConfirmModal from "@/features/DeleteConfirmModal/ui";
+import { AddCustomerModal } from "@/features/AddCustomerModal";
+import { HybridPaymentModal, type PaymentPart } from "@/features/HybridPaymentModal";
+
+import { useFilteredCustomers } from "@/entities/customer/model/useFilteredCustomers";
+
+import {
+  CloseIcon,
+  CustomerAddIcon,
+  MoreIcon,
+  SearchIcon,
+  TransferIcon,
+  LineDashedIcon,
+  CardIcon,
+  CashIcon,
+  DeleteIcon,
+} from "@/shared/ui/icons";
+import { HybridIcon } from "@/shared/ui/icons/payment";
+
+// scss
+import styles from "./Home.module.scss";
+import clsx from "clsx";
+import { useCreateSale } from "@/entities/sales/model/useCreateSale";
+import { useScanBarcode } from "@/entities/product/model/useScanBarcode";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/app/providers/StoreProvider/config/store";
+import { setPaymentMethods } from "@/entities/appSettings/model/appSettingsSlice";
+import type { ProductItem } from "@/entities/product/api/types";
+import Notification from "@/shared/ui/Notification";
+import { notifications } from "@/shared/config/notifications";
+import TablePagination from "@/shared/ui/Pagination";
+import { usePagination } from "@/shared/lib/hooks/usePagination";
+import { useBarcodeScanner } from "@/shared/lib/hooks/useBarcodeScanner";
+import Loader from "@/shared/ui/Loader";
+import ShiftStatus from "@/shared/ui/ShiftStatus";
+
+const headCols = [
+  "#",
+  "Kategoriya",
+  "Tovar nomi",
+  "Artikul (SKU)",
+  "O'lchov birligi",
+  "Soni",
+  "Narxi",
+  "",
+];
+
+const Home = () => {
+  const [limitReached, setLimitReached] = useState(false);
+  const [noStockAlert, setNoStockAlert] = useState(false);
+  const [productAdded, setProductAdded] = useState(false);
+
+  const [isDeleteModal, setIsDeleteModal] = useState(false);
+  const [isAddModal, setIsAddModal] = useState(false);
+  const [isAlertSelect, setIsAlertSelect] = useState(false);
+  const [isHybridModalOpen, setIsHybridModalOpen] = useState(false);
+  const [hybridPayments, setHybridPayments] = useState<PaymentPart[]>([]);
+  const [searchCustomer, setSearchCustomer] = useState("");
+  const filteredCustomers = useFilteredCustomers({ q: searchCustomer });
+  const paymentMethods = useSelector(
+    (state: RootState) => state.appSettings.paymentMethods
+  );
+  const dispatch = useDispatch();
+
+  const [customerData, setCustomerData] = useState({
+    full_name: "",
+    phone: "",
+  });
+
+  const [selectedCustomerId, setSelectedCustomerId] = useState(0);
+  const selectedCustomer = filteredCustomers.data?.data?.results?.find(
+    (item) => item.id === selectedCustomerId
+  );
+  const createSale = useCreateSale();
+
+  const [products, setProducts] = useState<ProductItem[]>([]);
+  const [scannedCode, setScannedCode] = useState<string>("");
+  const scanBarcode = useScanBarcode(scannedCode);
+
+  const { page, setPage, limit, offset } = usePagination(1, 7);
+
+  const totalProductCount = useMemo(
+    () => products.reduce((acc, item) => acc + (item.count ?? 1), 0),
+    [products]
+  );
+
+  const totalAmount = useMemo(
+    () => products.reduce((acc, item) => acc + parseFloat(item.sale_price || "0") * (item.count ?? 1), 0),
+    [products]
+  );
+
+  function clearData() {
+    setSelectedCustomerId(0);
+    setCustomerData({ full_name: "", phone: "" });
+    setProducts([]);
+    setScannedCode("");
+    setHybridPayments([]);
+  }
+
+  const handleDataById = () => {
+    if (products.length === 0) {
+      setIsAlertSelect(true);
+      return;
+    }
+
+    const selectedMethod = paymentMethods.find((method) => method.selected)?.method ?? "cash";
+
+    createSale
+      .mutateAsync({
+        customer: selectedCustomerId,
+        payment_method: selectedMethod,
+        hybrid_payments: selectedMethod === "hybrid" ? hybridPayments : undefined,
+        total_amount: 0,
+        items: products.map((product) => ({
+          product_id: product.id,
+          quantity: product.count ?? 1,
+          price: 0,
+        })),
+      })
+      .then(() => {
+        clearData();
+      })
+      .catch(() => {
+        clearData();
+      });
+  };
+
+  const handleData = () => {
+    if (!customerData.full_name || !customerData.phone) {
+      return;
+    }
+    if (products.length === 0) {
+      setIsAlertSelect(true);
+      return;
+    }
+
+    const selectedMethod = paymentMethods.find((method) => method.selected)?.method ?? "cash";
+
+    createSale
+      .mutateAsync({
+        new_customer: customerData,
+        payment_method: selectedMethod,
+        hybrid_payments: selectedMethod === "hybrid" ? hybridPayments : undefined,
+        // total_amount: 0,
+        items: products.map((product) => ({
+          product_id: product.id,
+          quantity: product.count ?? 1,
+          price: 0,
+        })),
+      })
+
+      .then((res) => {
+        clearData();
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log(e);
+
+        clearData();
+      });
+  };
+
+  const handleBaseData = () => {
+    if (products.length === 0) {
+      setIsAlertSelect(true);
+      return;
+    }
+
+    const selectedMethod = paymentMethods.find((method) => method.selected)?.method ?? "cash";
+
+    createSale
+      .mutateAsync({
+        payment_method: selectedMethod,
+        hybrid_payments: selectedMethod === "hybrid" ? hybridPayments : undefined,
+        total_amount: 0,
+        items: products.map((product) => ({
+          product_id: product.id,
+          quantity: product.count ?? 1,
+          price: 0,
+        })),
+      })
+
+      .then(() => {
+        clearData();
+      })
+      .catch(() => {
+        clearData();
+      });
+  };
+
+  function handleSubmit() {
+    const selectedMethod = paymentMethods.find((method) => method.selected)?.method;
+
+    // If hybrid payment is selected, open modal first
+    if (selectedMethod === "hybrid") {
+      if (products.length === 0) {
+        setIsAlertSelect(true);
+        return;
+      }
+      setIsHybridModalOpen(true);
+      return;
+    }
+
+    if (selectedCustomerId) {
+      handleDataById();
+      return;
+    }
+    if (customerData.full_name && customerData.phone) {
+      handleData();
+      return;
+    }
+
+    handleBaseData();
+  }
+
+  const handleHybridConfirm = (payments: PaymentPart[]) => {
+    setHybridPayments(payments);
+
+    // Execute payment after setting hybrid payments
+    setTimeout(() => {
+      if (selectedCustomerId) {
+        handleDataById();
+      } else if (customerData.full_name && customerData.phone) {
+        handleData();
+      } else {
+        handleBaseData();
+      }
+    }, 100);
+  };
+
+  const handleDeleteProduct = useCallback((id: number) => {
+    setProducts((prev) => prev.filter((product) => product.id !== id));
+  }, []);
+
+  const handleScan = useCallback((code: string) => {
+    setScannedCode(code);
+  }, []);
+
+  useBarcodeScanner({ onScan: handleScan, enabled: true });
+
+  const handleChange = useCallback(
+    (itemId: number) => {
+      dispatch(
+        setPaymentMethods(
+          paymentMethods.map((method) => ({
+            ...method,
+            selected: method.id === itemId,
+          }))
+        )
+      );
+    },
+    [dispatch, paymentMethods]
+  );
+
+  const handlePlusQuantity = (id: number) => {
+    setProducts((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const newCount = (item.count ?? 1) + 1;
+          const currentStock = item.inventory?.quantity || item.current_stock || 0;
+          // Проверка на всякий случай
+          if (newCount > Number(currentStock)) return item;
+          return { ...item, count: newCount };
+        }
+        return item;
+      })
+    );
+  };
+
+  const handleMinusQuantity = (id: number) => {
+    setProducts((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const newCount = (item.count ?? 1) - 1;
+          // Проверка на всякий случай
+          if (newCount < 1) return item;
+          return { ...item, count: newCount };
+        }
+        return item;
+      })
+    );
+  };
+
+  useEffect(() => {
+    if (scanBarcode.data?.data.product) {
+      const productItems = scanBarcode.data.data.product;
+      const currentStock = productItems.inventory?.quantity || productItems.current_stock || 0;
+
+      if (!currentStock || Number(currentStock) === 0) {
+        // Показываем уведомление что товара нет в наличии
+        setNoStockAlert(true);
+        setTimeout(() => setNoStockAlert(false), 3000);
+        setScannedCode("");
+        return;
+      }
+
+      setProducts((prev) => {
+        const existing = prev.find((p) => p.id === productItems.id);
+        if (existing) {
+          const currentCount = existing.count ?? 1;
+
+          if (currentCount >= Number(currentStock)) {
+            // Показываем уведомление о лимите
+            setLimitReached(true);
+            setTimeout(() => setLimitReached(false), 3000);
+            return prev;
+          }
+          setProductAdded(true);
+          setTimeout(() => setProductAdded(false), 3000);
+
+          return prev.map((p) =>
+            p.id === existing.id ? { ...p, count: (p.count ?? 1) + 1 } : p
+          );
+        }
+        setProductAdded(true);
+        setTimeout(() => setProductAdded(false), 3000);
+        return [...prev, { ...productItems, count: 1 }];
+      });
+
+      setScannedCode("");
+    }
+  }, [scanBarcode.data?.data.product]);
+
+  useEffect(() => {
+    if (selectedCustomerId) {
+      setCustomerData({ full_name: "", phone: "" });
+    }
+  }, [selectedCustomerId]);
+
+  // Если начали вводить данные вручную — сбрасываем выбранного клиента
+  useEffect(() => {
+    if (customerData.full_name || customerData.phone) {
+      setSelectedCustomerId(0);
+    }
+  }, [customerData]);
+
+  useEffect(() => {
+    console.log(products);
+  }, [products]);
+  return (
+    <div className={styles.home}>
+      {isDeleteModal && (
+        <DeleteConfirmModal setIsDeleteModal={setIsDeleteModal} />
+      )}
+
+      <AddCustomerModal
+        setCustomerData={setCustomerData}
+        setIsAddModal={setIsAddModal}
+        isAddModal={isAddModal}
+      />
+
+      <div className={styles.home__content}>
+        <header className={styles.header}>
+          <PageTitle>Kassa</PageTitle>
+          <div className={styles.header__btns}>
+            <span onClick={() => setProducts([])}>
+              <CloseIcon />
+            </span>
+          </div>
+        </header>
+
+        <ShiftStatus />
+
+        {/* <div className={styles.search}>
+          <Search placeholder="ID bo'yicha mahsulotlarni qidirish" />
+        </div> */}
+
+        <Table
+          headCols={headCols}
+          bodyCols={products
+
+            .slice(offset, offset + limit)
+            .map((item, index) => {
+              const currentStock = item.inventory?.quantity || item.current_stock || 0;
+
+              return {
+                id: item.id,
+                index: index + 1 + offset,
+                category_name: item.category_name,
+                name: item.name,
+                sku: item.sku || "-",
+                unit: item.unit_short || item.unit_name || item.unit_info?.short_name || "-",
+                quantity: (
+                  <div className={styles.quantity__action}>
+                    <button
+                      disabled={(item.count ?? 1) === 1}
+                      className={styles.action__btn}
+                      onClick={() => handleMinusQuantity(item.id)}
+                    >
+                      <span>-</span>
+                    </button>
+                    <p className={styles.quantity__count}>{`${
+                      item.count ?? 1
+                    }x`}</p>
+                    <button
+                      disabled={(item.count ?? 1) === Number(currentStock)}
+                      className={styles.action__btn}
+                      onClick={() => handlePlusQuantity(item.id)}
+                    >
+                      <span>+</span>
+                    </button>
+                  </div>
+                ),
+                sale_price: (+item.sale_price).toLocaleString("de-DE") + " uzs",
+                content_2: (
+                  <div onClick={() => handleDeleteProduct(item.id)}>
+                    <DeleteIcon />
+                  </div>
+                ),
+              };
+            })}
+          headCell={{
+            1: {
+              className: styles.cell__hash,
+            },
+            5: {
+              align: "center",
+            },
+            8: {
+              className: styles.thead__more,
+              content: <MoreIcon />,
+            },
+          }}
+          bodyCell={{
+            1: {
+              className: styles.row__index,
+              align: "center",
+            },
+            5: {
+              align: "center",
+            },
+            6: {
+              className: styles.product__count,
+            },
+            7: {
+              className: styles.product__price,
+            },
+            8: {
+              className: styles.delete__btn,
+
+              align: "center",
+            },
+          }}
+        />
+
+        {products.length === 0 && (
+          <div className={styles.empty}>
+            <img src="/empty.svg" alt="empty" />
+          </div>
+        )}
+
+        <TablePagination
+          current={page}
+          total={products.length || 0}
+          pageSize={limit}
+          onChange={(p) => setPage(p)}
+          bottom={100}
+        />
+
+        <footer className={styles.footer}>
+          <p className={styles.footer__title}>Mahsulotlar soni:</p>
+          <span className={styles.product__count}>{totalProductCount}</span>
+        </footer>
+      </div>
+
+      <div className={styles.home__sidebar}>
+        <div className={styles.home__sidebar__inner}>
+          <div className={styles.inner__top}>
+            <div className={styles.search}>
+              <div className={styles.search__wrapper}>
+                <SearchIcon />
+                <input
+                  value={searchCustomer}
+                  onChange={(e) => setSearchCustomer(e.target.value)}
+                  type="text"
+                  placeholder="Mijozlar"
+                />
+
+                <ul
+                  className={clsx(
+                    styles.dropdown,
+                    searchCustomer && styles.open
+                  )}
+                >
+                  {filteredCustomers.data?.data?.results?.map((item) => (
+                    <li
+                      key={item.id}
+                      onClick={() => {
+                        setSearchCustomer("");
+                        setSelectedCustomerId(item.id);
+                      }}
+                      style={{
+                        backgroundColor:
+                          selectedCustomerId === item.id ? "#f1f5f9" : "",
+                      }}
+                    >
+                      <p>{item.full_name}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <span
+                className={styles.customer_add}
+                onClick={() => {
+                  setIsAddModal(true);
+                }}
+              >
+                <CustomerAddIcon />
+              </span>
+            </div>
+            <div className={styles.total_price}>
+              <p>Umumiy summa:</p>
+              <span>
+                {products
+                  .reduce(
+                    (acc, item) =>
+                      acc + Number(item.sale_price) * (item.count ?? 1),
+                    0
+                  )
+                  .toLocaleString("de-DE")}
+                {" uzs"}
+              </span>
+            </div>
+            <div className={styles.customer__info}>
+              <div className={styles.role__wrapper}>
+                <span className={styles.customer__role}>Klient</span>
+                <span
+                  className={styles.clear__btn}
+                  onClick={() => {
+                    setCustomerData({ full_name: "", phone: "" });
+                    setSelectedCustomerId(0);
+                  }}
+                >
+                  <CloseIcon />
+                </span>
+              </div>
+              <p className={styles.customer__name}>
+                {selectedCustomerId
+                  ? selectedCustomer?.full_name
+                  : customerData.full_name}
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.ticket}>
+            <span className={styles.corner_cut}>
+              <LineDashedIcon />
+            </span>
+          </div>
+          <ul
+            className={clsx(
+              styles.inner__bottom,
+              paymentMethods.filter((pm) => pm.status).length === 3 &&
+                styles.three__methods
+            )}
+          >
+            {paymentMethods.map(
+              (item) =>
+                item.status && (
+                  <li
+                    key={item.id}
+                    className={clsx(
+                      styles.item,
+                      item.selected && styles.checked
+                    )}
+                    onClick={() => {
+                      // setIsAlertSelect(true);
+                      handleChange(item.id);
+                    }}
+                  >
+                    {item.method === "card" && (
+                      <CardIcon selected={item.selected} />
+                    )}
+                    {/* {item.method === "debt" && (
+                      <DebtIcon selected={item.selected} />
+                    )} */}
+                    {item.method === "transfer" && (
+                      <TransferIcon selected={item.selected} />
+                    )}
+                    {item.method === "cash" && (
+                      <CashIcon selected={item.selected} />
+                    )}
+                    {item.method === "hybrid" && (
+                      <HybridIcon selected={item.selected} />
+                    )}
+                    <p>{item.label}</p>
+                  </li>
+                )
+            )}
+          </ul>
+        </div>
+        <span onClick={handleSubmit} className={styles.home__sidebar__btn}>
+          {createSale.isPending ? (
+            <Loader color="#fff" size={45} />
+          ) : (
+            "Bajarildi"
+          )}
+        </span>
+      </div>
+
+      <HybridPaymentModal
+        isOpen={isHybridModalOpen}
+        onClose={() => setIsHybridModalOpen(false)}
+        totalAmount={totalAmount}
+        onConfirm={handleHybridConfirm}
+      />
+
+      <CreateModal
+        headTitle="Diqqat!"
+        onClose={() => setIsAlertSelect(false)}
+        isOpen={isAlertSelect}
+        width={768}
+        height={274}
+        btnTitle="Xo'p"
+        btnOnClick={() => setIsAlertSelect(false)}
+      >
+        <p className={styles.alert__title}>
+          Avval kassaga mahsulot qo'shing, shundan so'ng bu amalni bajarishingiz
+          mumkin.
+        </p>
+      </CreateModal>
+
+      <Notification
+        placement="top"
+        type="success"
+        message="Muvaffaqiyat"
+        description={notifications.sale.createSuccess}
+        onOpen={createSale.isSuccess}
+      />
+
+      <Notification
+        placement="top"
+        type="error"
+        message="Xatolik"
+        description={notifications.sale.createError}
+        onOpen={createSale.isError}
+      />
+
+      <Notification
+        placement="top"
+        type="success"
+        message="Muvaffaqiyat"
+        description={notifications.barcode.found}
+        onOpen={productAdded}
+      />
+
+      <Notification
+        placement="top"
+        type="error"
+        message="Xatolik"
+        description={notifications.barcode.notFound}
+        onOpen={scanBarcode.data?.data?.found === false}
+      />
+
+      <Notification
+        type="warning"
+        message="Limit!"
+        description="Mahsulot miqdori maksimal darajaga yetdi"
+        onOpen={limitReached}
+      />
+
+      <Notification
+        type="error"
+        message="Mahsulot yo'q!"
+        description="Bu mahsulot omborda mavjud emas"
+        onOpen={noStockAlert}
+      />
+    </div>
+  );
+};
+
+export default Home;

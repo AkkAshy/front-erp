@@ -1,0 +1,1073 @@
+{
+  "info": {
+    "name": "ERP System API",
+    "description": "Complete API collection for ERP system with multi-tenant support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "tenantKey",
+      "value": "tenant_admin",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"authToken\", jsonData.access);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "login", ""]
+            }
+          }
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/profile/",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "profile", ""]
+            }
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/users/?name=",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "users", ""],
+              "query": [
+                {
+                  "key": "name",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/products/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "products", ""]
+            }
+          }
+        },
+        {
+          "name": "Filter Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/products/?search=&created_by=&category=&offset=0&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "products", ""],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by product name"
+                },
+                {
+                  "key": "created_by",
+                  "value": "",
+                  "description": "Filter by user ID"
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "description": "Filter by category ID"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/products/1/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "products", "1", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Product\",\n  \"description\": \"Test product description\",\n  \"category\": 12,\n  \"unit\": 3,\n  \"cost_price\": 50000,\n  \"sale_price\": 75000,\n  \"wholesale_price\": 65000,\n  \"tax_rate\": 0,\n  \"initial_quantity\": 100,\n  \"min_quantity\": 10,\n  \"max_quantity\": 1000,\n  \"track_inventory\": true,\n  \"batch_number\": \"BATCH-001\",\n  \"expiry_date\": null,\n  \"supplier\": null,\n  \"weight\": 0.5,\n  \"volume\": 0.3,\n  \"is_featured\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/products/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "products", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Product Name\",\n  \"category\": 12,\n  \"sale_price\": 80000,\n  \"unit\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/products/1/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "products", "1", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/products/1/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "products", "1", ""]
+            }
+          }
+        },
+        {
+          "name": "Scan Barcode",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/products/scan_barcode/?barcode=1234567890123",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "products", "scan_barcode", ""],
+              "query": [
+                {
+                  "key": "barcode",
+                  "value": "1234567890123"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Low Stock Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/products/low_stock/?min_quantity=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "products", "low_stock", ""],
+              "query": [
+                {
+                  "key": "min_quantity",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/categories/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "categories", ""]
+            }
+          }
+        },
+        {
+          "name": "Filter Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/categories/?offset=0&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "categories", ""],
+              "query": [
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Новая категория\",\n  \"description\": \"Описание категории\",\n  \"parent\": null,\n  \"order\": 0,\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/categories/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "categories", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Обновленная категория\",\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/categories/1/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "categories", "1", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Units",
+      "item": [
+        {
+          "name": "Get All Units",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/units/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "units", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Unit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Штука\",\n  \"short_name\": \"шт\",\n  \"description\": \"Единица измерения - штука\",\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/units/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "units", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Batches",
+      "item": [
+        {
+          "name": "Create Batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product\": 1,\n  \"quantity\": 100,\n  \"purchase_price\": 45000,\n  \"batch_number\": \"BATCH-002\",\n  \"supplier\": null,\n  \"supplier_name\": \"Test Supplier\",\n  \"expiry_date\": null,\n  \"manufacturing_date\": null,\n  \"notes\": \"Test batch\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/batches/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "batches", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Batch",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 150,\n  \"purchase_price\": 48000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/batches/1/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "batches", "1", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attributes",
+      "item": [
+        {
+          "name": "Get All Attributes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/attributes/?limit=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "attributes", ""],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Attribute",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Размер\",\n  \"type\": \"text\",\n  \"description\": \"Размер одежды\",\n  \"is_required\": false,\n  \"is_filterable\": true,\n  \"order\": 0,\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/attributes/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "attributes", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Suppliers",
+      "item": [
+        {
+          "name": "Get All Suppliers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/suppliers/",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "suppliers", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sales",
+      "item": [
+        {
+          "name": "Get All Sales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sales/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sales", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Sale",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session\": 1,\n  \"receipt_number\": \"CHECK-001\",\n  \"customer_name\": \"Test Customer\",\n  \"customer_phone\": \"+998901234567\",\n  \"items\": [\n    {\n      \"product\": 1,\n      \"quantity\": 2,\n      \"unit_price\": 75000,\n      \"batch\": null\n    }\n  ],\n  \"payments\": [\n    {\n      \"payment_method\": \"cash\",\n      \"amount\": 150000,\n      \"received_amount\": 200000\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales/sales/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sales", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Sale by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sales/1/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sales", "1", ""]
+            }
+          }
+        },
+        {
+          "name": "Complete Sale",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sales/1/complete/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sales", "1", "complete", ""]
+            }
+          }
+        },
+        {
+          "name": "Cancel Sale",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sales/1/cancel/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sales", "1", "cancel", ""]
+            }
+          }
+        },
+        {
+          "name": "Refund Sale",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sales/1/refund/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sales", "1", "refund", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Today Sales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sales/today/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sales", "today", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cashier Sessions",
+      "item": [
+        {
+          "name": "Get Current Session",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sessions/current/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sessions", "current", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Active Sessions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sessions/active/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sessions", "active", ""]
+            }
+          }
+        },
+        {
+          "name": "Get All Sessions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sessions/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sessions", ""]
+            }
+          }
+        },
+        {
+          "name": "Open Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"opening_cash\": 100000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales/sessions/open/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sessions", "open", ""]
+            }
+          }
+        },
+        {
+          "name": "Close Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"closing_cash\": 500000,\n  \"notes\": \"End of shift\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales/sessions/1/close/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sessions", "1", "close", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Session Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sessions/1/report/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sessions", "1", "report", ""]
+            }
+          }
+        },
+        {
+          "name": "Suspend Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sessions/1/suspend/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sessions", "1", "suspend", ""]
+            }
+          }
+        },
+        {
+          "name": "Resume Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/sessions/1/resume/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "sessions", "1", "resume", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cash Registers",
+      "item": [
+        {
+          "name": "Get All Cash Registers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/cash-registers/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "cash-registers", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Cash Register Current Session",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/cash-registers/1/current_session/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "cash-registers", "1", "current_session", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Cash Register Sessions History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/cash-registers/1/sessions/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "cash-registers", "1", "sessions", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cash Movements",
+      "item": [
+        {
+          "name": "Get All Cash Movements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/cash-movements/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "cash-movements", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Cash Movement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session\": 1,\n  \"movement_type\": \"cash_in\",\n  \"reason\": \"deposit\",\n  \"amount\": 50000,\n  \"description\": \"Initial cash deposit\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales/cash-movements/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "cash-movements", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Get All Payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sales/payments/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "payments", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sale\": 1,\n  \"session\": 1,\n  \"payment_method\": \"card\",\n  \"amount\": 150000,\n  \"card_last4\": \"1234\",\n  \"transaction_id\": \"TXN123456\",\n  \"notes\": \"Card payment\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sales/payments/",
+              "host": ["{{baseUrl}}"],
+              "path": ["sales", "payments", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", ""]
+            }
+          }
+        },
+        {
+          "name": "Search Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Tenant-Key",
+                "value": "{{tenantKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/?q=",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", ""],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "",
+                  "description": "Search query"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  text-decoration: none;
+  outline: none;
+  font-family: "Sora", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  color: #0e1621;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+textarea {
+  resize: none;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Для Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+// =============================================================
+
+.app {
+  display: flex;
+  gap: 12px;
+  height: 100vh;
+  overflow: hidden;
+
+  .main__content {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    will-change: scroll-position;
+  }
+}

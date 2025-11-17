@@ -1,0 +1,105 @@
+.seller__wrapper {
+  position: relative;
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 16px);
+    left: 0;
+    right: 0;
+    border-radius: 16px;
+    border: 1px solid red;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+
+    opacity: 0;
+    pointer-events: none;
+    z-index: -10;
+    transition: opacity 0.3s;
+    overflow: hidden;
+    
+    &.open {
+      opacity: 1;
+      pointer-events: all;
+      z-index: 10;
+      transition: opacity 0.3s;
+    }
+    .line {
+      display: flex;
+      height: 1px;
+      width: 100%;
+      width: 328px;
+      margin: 8px auto;
+      background-color: #e2e8f0;
+    }
+    .search__wrapper {
+      height: 64px;
+    }
+    .list__sellers {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: scroll;
+      .seller {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        padding: 16px;
+        cursor: pointer;
+        .profile__wrapper {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          img {
+            height: 32px;
+            width: 32px;
+          }
+          .firstname {
+            font-weight: 400;
+            font-size: 20px;
+            line-height: 100%;
+            color: #94a3b8;
+          }
+        }
+        .role {
+          font-weight: 400;
+          font-size: 14px;
+          line-height: 100%;
+          color: #94a3b8;
+        }
+
+        &.selected {
+          background-color: #f1f5f9;
+          .firstname {
+            color: #0f1c3d;
+          }
+        }
+      }
+    }
+  }
+  .toggle__seller {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 360px;
+    height: 100%;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    .title__wrapper {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .title {
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 100%;
+      color: #0f1c3d;
+      & > span {
+        color: #94a3b8;
+      }
+    }
+  }
+}

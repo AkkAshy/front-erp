@@ -1,0 +1,178 @@
+// React и хуки
+import { useState, type FC } from "react";
+
+// библиотеки
+import clsx from "clsx";
+import { useLocation, useNavigate } from "react-router-dom";
+
+// Абсолютные импорты
+import {
+  CustomersIcon,
+  HistoryIcon,
+  HomeIcon,
+  InventoryIcon,
+  LogoutIcon,
+  SettingsIcon,
+  StatisticsIcon,
+  TasksIcon,
+} from "@/shared/ui/icons/navigation";
+import { ToggleBtnIcon } from "@/shared/ui/icons/actions";
+import type { IconProps } from "@/shared/ui/icons/types";
+
+// SCSS
+import { SettingsSidebar } from "@/pages/Settings";
+import styles from "./Sidebar.module.scss";
+import { useProfileInfo } from "@/entities/cashier/model/useProfileInfo";
+import { clearTokens } from "@/shared/api";
+
+const sidebarItems = [
+  { key: "home", title: "Kassa" },
+  { key: "statistics", title: "Hisobotlar" },
+  { key: "customers", title: "Mijozlar" },
+  { key: "history", title: "Tarix" },
+  { key: "inventory", title: "Ombor" },
+  { key: "tasks", title: "Vazifalar" },
+  { key: "settings", title: "Sozlamalar" },
+];
+
+const iconsMap: Record<string, FC<IconProps>> = {
+  home: HomeIcon,
+  statistics: StatisticsIcon,
+  TasksIcon,
+  customers: CustomersIcon,
+  history: HistoryIcon,
+  inventory: InventoryIcon,
+  tasks: TasksIcon,
+  settings: SettingsIcon,
+};
+
+type RoleItem = {
+  label: string;
+  role: string;
+};
+const mapRole: RoleItem[] = [
+  {
+    label: "sohib",
+    role: "owner",
+  },
+  {
+    label: "menedjer",
+    role: "manager",
+  },
+  {
+    label: "kassir",
+    role: "cashier",
+  },
+  {
+    label: "omborchi",
+    role: "stockkeeper",
+  },
+];
+
+const Sidebar = () => {
+  const [isToggleSidebar, setIsToggleSidebar] = useState(false);
+  const [isOpenSettingsSidebar, setIsOpenSettingsSidebar] = useState(false);
+  const profile = useProfileInfo();
+
+  const [curretPage, setCurretPage] = useState("");
+
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const currentPage =
+    location.pathname === "/" ? "home" : location.pathname.split("/")[1];
+
+  return (
+    <div className={clsx(styles.sidebar, isToggleSidebar && styles.close)}>
+      <div className={styles.logo} onClick={() => setIsToggleSidebar(false)}>
+        <div className={styles.logo_img}>
+          <img src="/logo.svg" alt="logo" />
+          <p className={styles.logo__title}>iMaster</p>
+        </div>
+
+        <button
+          className={styles.close_btn}
+          style={{ opacity: isToggleSidebar ? 0 : 1 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsToggleSidebar(true);
+          }}
+        >
+          <ToggleBtnIcon />
+        </button>
+      </div>
+
+      <div className={styles.sidebar__inner}>
+        <ul className={styles.nav_list}>
+          {sidebarItems.map((item) => {
+            const Icon = iconsMap[item.key];
+            return (
+              <li
+                key={item.key}
+                onClick={() => {
+                  navigate(item.key === "home" ? "/" : item.key);
+                  setIsOpenSettingsSidebar(item.key === "settings");
+                }}
+                className={clsx(
+                  styles.item,
+                  currentPage === item.key && styles.active
+                )}
+              >
+                <span className={styles.nav__icon}>
+                  {<Icon selected={currentPage === item.key} />}
+                </span>
+                <p className={styles.nav__title}>{item.title}</p>
+              </li>
+            );
+          })}
+        </ul>
+
+        <button
+          className={styles.logout_btn}
+          onClick={() => {
+            navigate("/auth");
+            clearTokens();
+          }}
+        >
+          <LogoutIcon />
+          <p className={styles.logout__title}>Chiqish</p>
+        </button>
+        <SettingsSidebar
+          curretPage={curretPage}
+          setCurretPage={setCurretPage}
+          isOpenSettingsSidebar={isOpenSettingsSidebar}
+          setIsOpenSettingsSidebar={setIsOpenSettingsSidebar}
+        />
+      </div>
+
+      <div
+        className={styles.profile}
+        onClick={() => {
+          setIsOpenSettingsSidebar(false);
+          navigate("profile");
+        }}
+      >
+        <img
+          src={
+            profile.data?.data?.employee?.sex === "Ayol"
+              ? "/female.png"
+              : "/male.png"
+          }
+          alt="avatar"
+        />
+        <div className={styles.profile__info}>
+          <p className={styles.profile__role}>
+            {mapRole.find(
+              (item) => item.role === profile.data?.data?.employee?.role
+            )?.label ?? "role"}
+          </p>
+          <p className={styles.profile__name}>
+            {profile.data?.data.first_name || "profile"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Sidebar;

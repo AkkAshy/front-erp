@@ -1,0 +1,72 @@
+.ant-notification-notice-wrapper {
+  .ant-notification-notice {
+    overflow: hidden;
+    border-radius: 8px;
+    &-success {
+      border: 2px solid #00c951;
+    }
+    &-error {
+      border: 2px solid #f44336;
+    }
+    &-warning {
+      border: 2px solid #ff9800;
+    }
+    &-info {
+      border: 2px solid #2196f3;
+    }
+    &-icon {
+      &-success {
+        svg {
+          path {
+            fill: #4caf50;
+          }
+        }
+      }
+      &-error {
+        svg {
+          path {
+            fill: #f44336;
+          }
+        }
+      }
+      &-warning {
+        svg {
+          path {
+            fill: #ff9800;
+          }
+        }
+      }
+
+      &-info {
+        svg {
+          path {
+            fill: #2196f3;
+          }
+        }
+      }
+    }
+    &-message {
+      font-weight: 500 !important;
+      font-size: 18px !important;
+      line-height: 100% !important;
+      color: #0f1c3d !important;
+    }
+    &-description {
+      font-weight: 400 !important;
+      font-size: 15px !important;
+      line-height: 100% !important;
+      color: #64748b !important;
+    }
+
+    &-close {
+      padding: 15px;
+      svg {
+        width: 20px !important;
+        height: 20px !important;
+        path {
+          fill: #64748b !important;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+.history {
+  position: relative;
+  flex: 1;
+  padding: 32px;
+  padding-bottom: 28px;
+  margin: 12px 12px 12px 0;
+  height: calc(100% - 32px);
+
+  &__header {
+    display: flex;
+    gap: 12px;
+    height: 64px;
+    margin-top: 22px;
+  }
+  .empty {
+    margin-top: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .status__сompleted,
+  .status__сancelled {
+    width: 165px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // margin: 0 auto;
+
+    border-radius: 100px;
+
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+  }
+  .status__сompleted {
+    background-color: #e3fbec;
+    color: #00c951;
+  }
+  .status__сancelled {
+    background-color: #ffe2e2b8;
+    color: #e7000b;
+  }
+  .status__сompletedd {
+    // border: 1px solid red;
+    background-color: red;
+  }
+  .cell__hash,
+  .row__index {
+    width: 64px;
+    height: 64px;
+    font-size: 25px;
+    text-align: center;
+  }
+  .total__price {
+    font-weight: 500;
+    color: #0f1c3d;
+    padding-left: 48px;
+  }
+}

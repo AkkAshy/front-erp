@@ -1,0 +1,33 @@
+.textarea {
+  width: 100%;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  margin-top: 16px;
+  font-size: 18px;
+  color: #1e293b;
+  font-weight: 500;
+  overflow-x: hidden;
+
+  -webkit-mask-image: -webkit-radial-gradient(white, black); // Safari fix
+  mask-image: radial-gradient(white, black); // для современных браузеров
+  &::placeholder {
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 100%;
+    color: #475569;
+  }
+}
+
+.char_count {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  font-weight: 300;
+  font-size: 19px;
+  line-height: 100%;
+  color: #475569;
+  text-align: end;
+  padding-right: 12px;
+  margin-top: 12px;
+}
