@@ -64,7 +64,7 @@ const Statistics = () => {
 
   const topProducts = useTopProducts({
     limit: 5,
-    start_date: fromDate || getToday(),
+    order_by: "revenue",
   });
 
   const topProductsTotal = useMemo(
@@ -76,8 +76,8 @@ const Statistics = () => {
     [topProducts.data]
   );
 
-  // useTopCustomers не принимает параметры, используем getCustomerAnalytics
-  const topCustomers = useTopCustomers();
+  // useTopCustomers получает топ клиентов из customer-analytics и сортирует по monetary
+  const topCustomers = useTopCustomers(5);
 
   const transactionsByDay = useTransactionsByDay({
     date_from: fromDate || getToday(),
