@@ -30,8 +30,9 @@ const SelectSeller: FC<Props> = ({
   });
 
   useEffect(() => {
-    if (users.data?.data) {
-      setUsersData(users.data.data.employees);
+    if (users.data) {
+      // Employees это просто User[], не объект с полем data
+      setUsersData(users.data);
     }
   }, [users]);
 

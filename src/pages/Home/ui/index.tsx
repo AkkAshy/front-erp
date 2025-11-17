@@ -55,10 +55,11 @@ const Home = () => {
   const scanBarcode = useScanBarcode(scannedCode, !!scannedCode);
 
   // Get current sale data
+  // useCurrentSale теперь возвращает CurrentSaleResponse напрямую (не обернутый в { data })
   const sale = currentSale.data?.data?.sale;
   const items = sale?.items || [];
   const totalAmount = parseFloat(sale?.total_amount || "0");
-  const totalProductCount = items.reduce((acc, item) => acc + parseFloat(item.quantity), 0);
+  const totalProductCount = items.reduce((acc: number, item: { quantity: string }) => acc + parseFloat(item.quantity), 0);
 
   // Handle barcode scan - двухшаговый процесс
   const handleScan = useCallback(
@@ -142,7 +143,7 @@ const Home = () => {
     if (!sale?.id || items.length === 0) return;
 
     // Remove all items one by one using item.id
-    items.forEach((item) => {
+    items.forEach((item: { id: number }) => {
       removeItem.mutate({
         saleId: sale.id,
         itemId: item.id,  // ID позиции в продаже
@@ -206,7 +207,7 @@ const Home = () => {
 
         <Table
           headCols={headCols}
-          bodyCols={items.slice(offset, offset + limit).map((item, index) => ({
+          bodyCols={items.slice(offset, offset + limit).map((item: { id: number; product_name: string; quantity: string; unit_price: string }, index: number) => ({
             id: item.id,
             index: index + 1 + offset,
             category_name: "-", // Category name not included in sale item

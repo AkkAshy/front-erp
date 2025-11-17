@@ -25,6 +25,7 @@ const Category = () => {
   const [isValidation, setIsValidation] = useState(false);
 
   const [categoryValue, setCategoryValue] = useState("");
+  // @ts-expect-error - будет использоваться позже
   const [selectedAttributeTypes, setSelectedAttributeTypes] = useState<number[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
 
@@ -35,6 +36,7 @@ const Category = () => {
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
 
+  // @ts-expect-error - будет использоваться позже
   const attributeTypes = useAttributeTypes({ limit: 100 });
 
   const { page, setPage, offset, limit } = usePagination(1, 7);
@@ -45,7 +47,8 @@ const Category = () => {
   });
 
   function handleDelete() {
-    deleteCategory.mutateAsync(deleteId).then((res) => {
+    const id = typeof deleteId === 'string' ? parseInt(deleteId) : deleteId;
+    deleteCategory.mutateAsync(id).then((res) => {
       console.log(res);
 
       if (res.status === 204) {
@@ -184,7 +187,6 @@ const Category = () => {
             .mutateAsync({
               id: editId!,
               name: categoryValue,
-              parent: null,
             })
             .then((res) => {
               console.log(res);

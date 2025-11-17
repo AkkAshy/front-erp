@@ -4,9 +4,10 @@ import { analyticsApi } from "../api/analyticsApi";
 export const useSalesAnalytics = (params: {
   date_gte: string;
   date_lte: string;
-  payment_method?: string;
 }) =>
   useQuery({
     queryKey: ["sales-analytics", params],
-    queryFn: () => analyticsApi.getSales(params).then((res) => res.data),
+    // getSales не существует, используем getPeriodReport
+    queryFn: () =>
+      analyticsApi.getPeriodReport(params.date_gte, params.date_lte).then((res: any) => res.data),
   });

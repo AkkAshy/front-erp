@@ -47,7 +47,16 @@ const UpdateProduct: FC<Props> = ({
     if (product) {
       setProductName(product.name);
       setCategoryId(product.category);
-      setUnitId(product.unit.id);
+      // Проверяем тип unit - может быть number или объект с id
+      if (typeof product.unit === 'number') {
+        setUnitId(product.unit);
+      } else if (product.unit && typeof product.unit === 'object') {
+        // Type guard для проверки наличия поля id
+        const unitObj = product.unit as { id?: number };
+        if (unitObj.id !== undefined) {
+          setUnitId(unitObj.id);
+        }
+      }
 
       if (product.size) {
         // This is a clothing item with size
@@ -55,18 +64,18 @@ const UpdateProduct: FC<Props> = ({
           {
             id: product.id,
             size: product.size.size,
-            quantity: product.batches[0]?.quantity ?? 0,
+            quantity: product.batches?.[0]?.quantity ?? 0,
           },
         ]);
         setQuantity("");
       } else {
         // This is a non-clothing item
         setSelectedSizes([]);
-        setQuantity(String(product.batches[0]?.quantity ?? ""));
+        setQuantity(String(product.batches?.[0]?.quantity ?? ""));
       }
 
       setPurchasePrice(
-        product.batches[0]?.purchase_price
+        product.batches?.[0]?.purchase_price
           ? (+product.batches[0].purchase_price).toLocaleString("de-DE")
           : "0"
       );
@@ -111,7 +120,9 @@ const UpdateProduct: FC<Props> = ({
                 ? +selectedSizes[0].quantity
                 : +quantity,
               purchase_price: +purchasePrice.replace(/\./g, ""),
-              supplier: product.batches[0].supplier || "",
+              supplier: typeof product.batches[0].supplier === 'number'
+                ? product.batches[0].supplier
+                : (product.batches[0].supplier || 0),
             });
           }
 

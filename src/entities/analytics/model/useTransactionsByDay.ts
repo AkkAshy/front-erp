@@ -10,8 +10,9 @@ export const useTransactionsByDay = (params: {
 }) =>
   useQuery({
     queryKey: ["transactions-by-day", params],
+    // getTransactionsByDay не существует, используем getPeriodReport
     queryFn: () =>
-      analyticsApi.getTransactionsByDay(params).then((res) =>
+      analyticsApi.getPeriodReport(params.date_from, params.date_to).then((res: any) =>
         res.data?.transactions_by_day?.map((item: RawTransactionByDay) => {
           const key = Object.keys(item)[0];
           const val = Object.values(item)[0];

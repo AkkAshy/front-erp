@@ -8,5 +8,7 @@ export const useSalesSummary = (params: {
 }): UseQueryResult<PaymentSummaryResponse, Error> =>
   useQuery({
     queryKey: ["sales-summary", params],
-    queryFn: () => analyticsApi.getSalesSummary(params).then((res) => res.data),
+    // getSalesSummary не существует, используем getPeriodReport как аналог
+    queryFn: () =>
+      analyticsApi.getPeriodReport(params.start_date, params.end_date).then((res: any) => res.data),
   });

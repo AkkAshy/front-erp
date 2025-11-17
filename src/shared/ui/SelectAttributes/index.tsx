@@ -35,7 +35,7 @@ const SelectAttributes: FC<Props> = ({
 }) => {
   const [search, setSearch] = useState("");
   const { data: attributeValuesData } = useAttributeValues({
-    attribute_type: attributeTypeId,
+    attribute: attributeTypeId,
   });
   const [attributesData, setAttributesData] = useState<
     AttributeValueWithSelection[]

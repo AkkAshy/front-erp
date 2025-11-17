@@ -35,23 +35,21 @@ const Profile = () => {
   const inputRef = useMask(maskOptions);
 
   useEffect(() => {
-    if (profile.data) {
-      // Используем структуру из нового API: data.user
-      const userData = profile.data?.data?.user;
-      const employeeData = profile.data?.data?.employee;
+    if (profile.data?.data) {
+      // useProfileInfo возвращает { data: UserInfo }, поэтому доступ через profile.data.data
+      const userData = profile.data.data;
+      setName(userData.first_name || "");
+      setSurname(userData.last_name || "");
 
-      setName(userData?.first_name || "");
-      setSurname(userData?.last_name || "");
-
-      const phoneNumber = employeeData?.phone;
+      const phoneNumber = userData.employee?.phone;
       if (phoneNumber) {
         setPhone(format(phoneNumber.replace(/^\+998/, ""), maskOptions));
       } else {
         setPhone("");
       }
 
-      // В новом API нет поля sex, оставляем пустым или используем default
-      setGender("");
+      // Устанавливаем gender из employee.sex если есть
+      setGender(userData.employee?.sex || "");
     }
   }, [profile.data]);
 
@@ -99,8 +97,8 @@ const Profile = () => {
 
           <div className={styles.profile__info}>
             <p className={styles.profile__name}>
-              {profile.data?.data?.user?.full_name ||
-               `${profile.data?.data?.user?.first_name || ''} ${profile.data?.data?.user?.last_name || ''}`}
+              {profile.data?.data?.full_name ||
+               `${profile.data?.data?.first_name || ''} ${profile.data?.data?.last_name || ''}`}
             </p>
             <span className={styles.profile__phone}>
               {formatUzPhone(profile.data?.data?.employee?.phone)}

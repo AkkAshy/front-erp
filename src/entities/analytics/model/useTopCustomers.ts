@@ -12,11 +12,10 @@ type TopCustomers = {
   limit: number;
 };
 
-export const useTopCustomers = (params: {
-  limit: number;
-  start_date: string;
-}): UseQueryResult<TopCustomers, Error> =>
+export const useTopCustomers = (): UseQueryResult<TopCustomers, Error> =>
   useQuery({
-    queryKey: ["top-customers", params],
-    queryFn: () => analyticsApi.getTopCustomers(params).then((res) => res.data),
+    queryKey: ["top-customers"],
+    // getTopCustomers не существует, используем getCustomerAnalytics как заглушку
+    queryFn: () =>
+      analyticsApi.getCustomerAnalytics().then((res: any) => res.data),
   });

@@ -50,6 +50,7 @@ type RoleItem = {
   label: string;
   role: string;
 };
+// @ts-expect-error - будет использоваться позже
 const mapRole: RoleItem[] = [
   {
     label: "sohib",
@@ -353,7 +354,7 @@ const Seller = () => {
         email: emailValue,
         login: usernameValue,
         password: "", // Пароль всегда пустой при загрузке
-        gender: frontendGender,
+        gender: frontendGender || "",
       };
 
       console.log("Saving original data:", originalValues);

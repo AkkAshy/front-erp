@@ -34,6 +34,9 @@ const headCols = [
   "",
 ];
 
+// Local type for UI state with selection
+type CustomerWithSelection = Customer & { selected?: boolean };
+
 const Customers = () => {
   const [isOpenForm, setIsOpenForm] = useState(false);
   const [isSmsModal, setIsSmsModal] = useState(false);
@@ -51,7 +54,7 @@ const Customers = () => {
     limit,
   });
 
-  const [customersData, setCustomersData] = useState<Customer[]>([]);
+  const [customersData, setCustomersData] = useState<CustomerWithSelection[]>([]);
   const [selectedCustomers, setSelectedCustomers] = useState<
     {
       id: number;
@@ -140,12 +143,12 @@ const Customers = () => {
               </div>
             ),
             index: index + 1 + offset,
-            full_name: item.full_name,
+            full_name: `${item.first_name} ${item.last_name || ''}`.trim(),
             phone: item.phone,
             last_purchase_date: item.last_purchase_date
               ? format(parseISO(item.last_purchase_date), "dd.MM.yyyy")
               : "-",
-            count: item.purchase_count,
+            count: item.total_purchases || 0,
             debt:
               (Number(item.total_spent) || 0).toLocaleString("de-DE") + " uzs",
             content_2: (

@@ -7,12 +7,10 @@ export const useUpdateCategory = () => {
     mutationFn: ({
       id,
       name,
-      attribute_types,
     }: {
       id: number;
       name?: string;
-      attribute_types?: number[];
-    }) => categoryApi.update(id, { name, attribute_types }),
+    }) => categoryApi.update(id, { name }),
     onSuccess: () => {
       // Обновляем список
       queryClient.invalidateQueries({ queryKey: ["categories"] });

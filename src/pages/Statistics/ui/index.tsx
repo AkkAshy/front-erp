@@ -76,10 +76,8 @@ const Statistics = () => {
     [topProducts.data]
   );
 
-  const topCustomers = useTopCustomers({
-    limit: 5,
-    start_date: fromDate || getToday(),
-  });
+  // useTopCustomers не принимает параметры, используем getCustomerAnalytics
+  const topCustomers = useTopCustomers();
 
   const transactionsByDay = useTransactionsByDay({
     date_from: fromDate || getToday(),

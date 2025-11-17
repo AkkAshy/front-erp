@@ -70,6 +70,7 @@ export type UserInfo = {
   groups: string[];
   employee: {
     role: string;
+    role_display?: string;
     phone: string;
     photo: string | null;
     sex: string | null;

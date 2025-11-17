@@ -9,6 +9,7 @@ type ModalProps = {
   headTitle?: string;
   btnTitle?: string;
   btnClose?: boolean;
+  btnDisabled?: boolean;
   height?: number | string;
   width?: number | string;
   mt?: number | string;
@@ -29,6 +30,7 @@ const CreateModal: FC<ModalProps> = ({
   headTitle,
   btnTitle,
   btnClose = true,
+  btnDisabled = false,
   height,
   width,
   mt,
@@ -74,8 +76,12 @@ const CreateModal: FC<ModalProps> = ({
               className={styles.modal__btns}
             >
               <span
-                onClick={btnOnClick}
-                style={{ width: btnWidth }}
+                onClick={btnDisabled ? undefined : btnOnClick}
+                style={{
+                  width: btnWidth,
+                  opacity: btnDisabled ? 0.5 : 1,
+                  cursor: btnDisabled ? 'not-allowed' : 'pointer'
+                }}
                 className={styles.btn_bottom}
               >
                 {btnTitle}

@@ -5,7 +5,6 @@ import type {
   ScanItemResponse,
   CurrentSaleResponse,
   AddItemRequest,
-  RemoveItemRequest,
   CheckoutRequest,
   CheckoutResponse,
 } from "./types";
@@ -21,7 +20,10 @@ export const useScanItem = () => {
   const queryClient = useQueryClient();
 
   return useMutation<ScanItemResponse, Error, ScanItemRequest>({
-    mutationFn: (data) => salesApi.scanItem(data),
+    mutationFn: async (data) => {
+      const response = await salesApi.scanItem(data);
+      return response.data;
+    },
     onSuccess: () => {
       // Invalidate current sale to refresh the cart
       queryClient.invalidateQueries({ queryKey: ["currentSale"] });
@@ -36,7 +38,10 @@ export const useScanItem = () => {
 export const useCurrentSale = (session: number | null) => {
   return useQuery<CurrentSaleResponse>({
     queryKey: ["currentSale", session],
-    queryFn: () => salesApi.getCurrentSale(session!),
+    queryFn: async () => {
+      const response = await salesApi.getCurrentSale(session!);
+      return response.data;
+    },
     enabled: !!session, // Only fetch if session exists
     refetchInterval: 5000, // Auto-refresh every 5 seconds
   });
@@ -81,7 +86,10 @@ export const useCheckout = () => {
   const queryClient = useQueryClient();
 
   return useMutation<CheckoutResponse, Error, { saleId: number; data: CheckoutRequest }>({
-    mutationFn: ({ saleId, data }) => salesApi.checkout(saleId, data),
+    mutationFn: async ({ saleId, data }) => {
+      const response = await salesApi.checkout(saleId, data);
+      return response.data;
+    },
     onSuccess: () => {
       // Clear current sale
       queryClient.invalidateQueries({ queryKey: ["currentSale"] });
