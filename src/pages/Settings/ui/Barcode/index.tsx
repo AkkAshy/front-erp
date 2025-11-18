@@ -99,20 +99,85 @@ const Barcode = () => {
           <!DOCTYPE html>
           <html>
           <head>
-            <title>Печать этикетки - ${labelData.product.name}</title>
+            <title>Etiketka - ${labelData.product.name}</title>
             <meta charset="UTF-8">
             <style>
+              @page {
+                size: 58mm 40mm;
+                margin: 0;
+              }
+
               * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
               }
 
-              @page {
-                size: 58mm 40mm;
+              body {
+                width: 58mm;
                 margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background: white;
+              }
+
+              .label {
+                display: block;
+                width: 58mm;
+                padding: 2mm;
+                background: #fff;
+                page-break-after: always;
+                overflow: visible;
+              }
+
+              .label:last-child {
+                page-break-after: avoid;
+              }
+
+              .store-name,
+              .product-name,
+              .price {
+                display: block;
+                text-align: center;
+                width: 100%;
+                margin: 1mm 0;
+                color: #000;
+                overflow: visible;
+              }
+
+              .store-name {
+                font-size: 11px;
+                font-weight: bold;
+                margin-bottom: 0.5mm;
+              }
+
+              .product-name {
+                font-size: 13px;
+                font-weight: bold;
+                margin-bottom: 1mm;
+                line-height: 1.3;
+                word-wrap: break-word;
+                white-space: normal;
+              }
+
+              .barcode {
+                display: block;
+                width: 54mm;
+                height: 16mm;
+                margin: 1mm auto;
+              }
+
+              .price {
+                font-size: 16px;
+                font-weight: 600;
+                margin-top: 1mm;
+              }
+
+              .sku {
+                font-size: 9px;
+                color: #333;
+                text-align: center;
+                margin: 1mm 0;
               }
 
               @media print {
@@ -122,102 +187,23 @@ const Barcode = () => {
                 }
 
                 body {
-                  margin: 0 !important;
-                  padding: 0 !important;
+                  margin: 0;
+                  padding: 0;
                 }
 
                 .label {
-                  border: none !important;
-                  margin: 0 !important;
-                  page-break-after: always !important;
+                  border: none;
+                  margin: 0;
                 }
 
-                .label:last-child {
-                  page-break-after: avoid !important;
-                }
-
-                * {
-                  visibility: visible !important;
-                  opacity: 1 !important;
-                  display: block !important;
-                }
-
+                .store-name,
+                .product-name,
+                .price,
                 .barcode {
+                  visibility: visible !important;
                   display: block !important;
+                  opacity: 1 !important;
                 }
-              }
-
-              body {
-                font-family: Arial, sans-serif;
-                width: 58mm;
-                margin: 0;
-                padding: 0;
-                background: white;
-              }
-
-              .label {
-                width: 58mm;
-                height: 40mm;
-                padding: 2mm;
-                margin: 0;
-                background: white;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: space-between;
-                page-break-after: always;
-              }
-
-              .label:last-child {
-                page-break-after: avoid;
-              }
-
-              .store-name {
-                font-size: 11px;
-                font-weight: bold;
-                text-align: center;
-                color: #000;
-                margin: 0 0 1mm 0;
-                width: 100%;
-                line-height: 1.2;
-              }
-
-              .product-name {
-                font-size: 13px;
-                font-weight: bold;
-                text-align: center;
-                color: #000;
-                margin: 0 0 1mm 0;
-                width: 100%;
-                max-height: 10mm;
-                overflow: hidden;
-                line-height: 1.3;
-                word-wrap: break-word;
-              }
-
-              .barcode {
-                width: 54mm;
-                height: 16mm;
-                object-fit: contain;
-                margin: 1mm 0;
-                display: block;
-              }
-
-              .price {
-                font-size: 18px;
-                font-weight: bold;
-                text-align: center;
-                color: #000;
-                margin: 1mm 0 0 0;
-                width: 100%;
-                line-height: 1.2;
-              }
-
-              .sku {
-                font-size: 9px;
-                color: #333;
-                text-align: center;
-                margin: 1mm 0;
               }
             </style>
           </head>
@@ -235,11 +221,11 @@ const Barcode = () => {
             `).join('')}
             <script>
               window.onload = () => {
-                // Даем время загрузиться изображению штрихкода
+                // Увеличенная задержка для полной загрузки
                 setTimeout(() => {
                   window.print();
-                  setTimeout(() => window.close(), 1000);
-                }, 300);
+                  setTimeout(() => window.close(), 500);
+                }, 600);
               };
             </script>
           </body>
