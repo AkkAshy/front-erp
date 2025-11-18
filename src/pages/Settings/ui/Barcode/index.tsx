@@ -100,38 +100,72 @@ const Barcode = () => {
           <html>
           <head>
             <title>Печать этикетки - ${labelData.product.name}</title>
+            <meta charset="UTF-8">
             <style>
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+
+              @page {
+                size: 58mm 40mm;
+                margin: 0;
+              }
+
               @media print {
                 @page {
                   size: 58mm 40mm;
-                  margin: 2mm;
-                }
-                body {
                   margin: 0;
-                  padding: 0;
+                }
+
+                body {
+                  margin: 0 !important;
+                  padding: 0 !important;
+                }
+
+                .label {
+                  border: none !important;
+                  margin: 0 !important;
+                  page-break-after: always !important;
+                }
+
+                .label:last-child {
+                  page-break-after: avoid !important;
+                }
+
+                * {
+                  visibility: visible !important;
+                  opacity: 1 !important;
+                  display: block !important;
+                }
+
+                .barcode {
+                  display: block !important;
                 }
               }
 
               body {
                 font-family: Arial, sans-serif;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 5px;
+                width: 58mm;
+                margin: 0;
+                padding: 0;
+                background: white;
               }
 
               .label {
-                width: 54mm;
-                height: 36mm;
-                border: 1px solid #ccc;
-                padding: 3mm;
-                margin-bottom: 5mm;
-                page-break-after: always;
+                width: 58mm;
+                height: 40mm;
+                padding: 2mm;
+                margin: 0;
+                background: white;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: space-between;
+                page-break-after: always;
               }
 
               .label:last-child {
@@ -139,39 +173,51 @@ const Barcode = () => {
               }
 
               .store-name {
-                font-size: 10px;
+                font-size: 11px;
                 font-weight: bold;
                 text-align: center;
-                margin-bottom: 1mm;
+                color: #000;
+                margin: 0 0 1mm 0;
+                width: 100%;
+                line-height: 1.2;
               }
 
               .product-name {
-                font-size: 12px;
+                font-size: 13px;
                 font-weight: bold;
                 text-align: center;
-                margin-bottom: 2mm;
-                max-height: 8mm;
+                color: #000;
+                margin: 0 0 1mm 0;
+                width: 100%;
+                max-height: 10mm;
                 overflow: hidden;
+                line-height: 1.3;
+                word-wrap: break-word;
               }
 
               .barcode {
-                width: 100%;
-                height: 15mm;
+                width: 54mm;
+                height: 16mm;
                 object-fit: contain;
-                margin: 2mm 0;
+                margin: 1mm 0;
+                display: block;
               }
 
               .price {
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: bold;
                 text-align: center;
-                margin-top: 2mm;
+                color: #000;
+                margin: 1mm 0 0 0;
+                width: 100%;
+                line-height: 1.2;
               }
 
               .sku {
-                font-size: 8px;
-                color: #666;
+                font-size: 9px;
+                color: #333;
                 text-align: center;
+                margin: 1mm 0;
               }
             </style>
           </head>
@@ -189,8 +235,11 @@ const Barcode = () => {
             `).join('')}
             <script>
               window.onload = () => {
-                window.print();
-                setTimeout(() => window.close(), 500);
+                // Даем время загрузиться изображению штрихкода
+                setTimeout(() => {
+                  window.print();
+                  setTimeout(() => window.close(), 1000);
+                }, 300);
               };
             </script>
           </body>
