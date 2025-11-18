@@ -3,14 +3,22 @@ import { PrinterIcon } from "@/shared/ui/icons";
 import { useProducts } from "@/entities/product/model/useProducts";
 import type { ProductItem } from "@/entities/product/api/types";
 import { GenerateBarcode } from "@/shared/ui/GenerateBarcode";
-import { productApi } from "@/entities/product/api/productApi";
 import axios from "axios";
+import JsBarcode from "jsbarcode";
 
 import styles from "./Barcode.module.scss";
 import { useProfileInfo } from "@/entities/cashier/model/useProfileInfo";
 
 // URL вашего локального сервера печати
 const PRINT_SERVER_URL = "http://localhost:31415";
+
+const svgToBase64 = (svgString: string): string => {
+  const bytes = new TextEncoder().encode(svgString);
+  const binString = Array.from(bytes, (byte) =>
+    String.fromCodePoint(byte)
+  ).join("");
+  return btoa(binString);
+};
 
 const Barcode = () => {
   const barcodes = useProducts();
@@ -52,30 +60,85 @@ const Barcode = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handlePrint = async (item: ProductItem, quantity: number = 1) => {
-    // Проверяем наличие штрихкода
+  const createSVGLabel = (item: ProductItem) => {
+    // Генерируем штрихкод с JsBarcode
+    const tempDiv = document.createElement("div");
+    const svgElement = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    );
+
+    JsBarcode(svgElement, String(item.barcode), {
+      format: "CODE128",
+      width: 4,
+      height: 80,
+      displayValue: false,
+      margin: 0,
+    });
+
+    svgElement.setAttribute("width", "520");
+    tempDiv.appendChild(svgElement);
+    const barcodeContent = tempDiv.innerHTML;
+
+    // Создаем SVG этикетку с всеми элементами
+    const svg = `
+    <svg width="580" height="400" xmlns="http://www.w3.org/2000/svg" style="font-family: Arial, sans-serif;">
+      <rect width="580" height="400" fill="white"/>
+
+      <text x="290" y="50" font-size="28" font-weight="bold" text-anchor="middle">
+        ${storeName}
+      </text>
+
+      <g transform="translate(0, 60)">
+        <text x="290" y="80" font-size="48" font-weight="bold" text-anchor="middle">
+          ${(+item.sale_price).toLocaleString("de-DE")} uzs
+        </text>
+
+        <text x="290" y="120" font-size="28" text-anchor="middle">
+          ${item.name}
+        </text>
+
+        <g transform="translate(30, 160)">
+          ${barcodeContent}
+        </g>
+
+        <text x="290" y="280" font-size="26" text-anchor="middle">
+          ${item.barcode}
+        </text>
+      </g>
+
+      <g transform="translate(540, 50)">
+        <circle cx="0" cy="0" r="35" fill="none" stroke="#333" stroke-width="2"/>
+        <text x="0" y="8" font-size="28" font-weight="bold" text-anchor="middle">
+          ${item.size?.size || "-"}
+        </text>
+      </g>
+    </svg>
+  `;
+
+    return svg;
+  };
+
+  const handlePrint = async (item: ProductItem) => {
     if (!item.barcode || String(item.barcode).trim() === "") {
       alert("Bu mahsulotda shtrix kod yo'q");
       return;
     }
 
     try {
-      // Получаем данные этикетки с backend
-      const labelResponse = await productApi.getPrintLabel(item.id, quantity);
-      const labelData = labelResponse.data.data;
+      const svgString = createSVGLabel(item);
+      const svgBase64 = svgToBase64(svgString);
+      const imageData = `data:image/svg+xml;base64,${svgBase64}`;
 
-      console.log("Label data received:", labelData);
-
-      // Если есть print server, отправляем туда
       if (serverStatus === "online") {
-        // Отправляем на сервер печати
+        // Отправляем на print-server
         const response = await axios.post(`${PRINT_SERVER_URL}/print`, {
-          base64Image: labelData.barcode_image, // Backend уже вернул base64 изображение
+          base64Image: imageData,
           printerName: "Xprinter XP-365B",
           itemInfo: {
-            name: labelData.product.name,
-            barcode: labelData.product.barcode,
-            price: labelData.price.sale_price,
+            name: item.name,
+            barcode: item.barcode,
+            price: item.sale_price,
           },
         });
 
@@ -88,7 +151,7 @@ const Barcode = () => {
           alert(`Ошибка печати: ${result.error || "Неизвестная ошибка"}`);
         }
       } else {
-        // Если print server недоступен, открываем окно браузера для печати
+        // Fallback: печать через браузер
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
           alert('Не удалось открыть окно печати. Разрешите всплывающие окна.');
@@ -99,133 +162,22 @@ const Barcode = () => {
           <!DOCTYPE html>
           <html>
           <head>
-            <title>Etiketka - ${labelData.product.name}</title>
+            <title>Etiketka</title>
             <meta charset="UTF-8">
             <style>
-              @page {
-                size: 58mm 40mm;
-                margin: 0;
-              }
-
-              * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-              }
-
-              body {
-                width: 58mm;
-                margin: 0;
-                padding: 0;
-                font-family: Arial, sans-serif;
-                background: white;
-              }
-
-              .label {
-                display: block;
-                width: 58mm;
-                padding: 2mm;
-                background: #fff;
-                page-break-after: always;
-                overflow: visible;
-              }
-
-              .label:last-child {
-                page-break-after: avoid;
-              }
-
-              .store-name,
-              .product-name,
-              .price {
-                display: block;
-                text-align: center;
-                width: 100%;
-                margin: 1mm 0;
-                color: #000;
-                overflow: visible;
-              }
-
-              .store-name {
-                font-size: 11px;
-                font-weight: bold;
-                margin-bottom: 0.5mm;
-              }
-
-              .product-name {
-                font-size: 13px;
-                font-weight: bold;
-                margin-bottom: 1mm;
-                line-height: 1.3;
-                word-wrap: break-word;
-                white-space: normal;
-              }
-
-              .barcode {
-                display: block;
-                width: 54mm;
-                height: 16mm;
-                margin: 1mm auto;
-              }
-
-              .price {
-                font-size: 16px;
-                font-weight: 600;
-                margin-top: 1mm;
-              }
-
-              .sku {
-                font-size: 9px;
-                color: #333;
-                text-align: center;
-                margin: 1mm 0;
-              }
-
-              @media print {
-                @page {
-                  size: 58mm 40mm;
-                  margin: 0;
-                }
-
-                body {
-                  margin: 0;
-                  padding: 0;
-                }
-
-                .label {
-                  border: none;
-                  margin: 0;
-                }
-
-                .store-name,
-                .product-name,
-                .price,
-                .barcode {
-                  visibility: visible !important;
-                  display: block !important;
-                  opacity: 1 !important;
-                }
-              }
+              @page { size: 58mm 40mm; margin: 0; }
+              body { margin: 0; padding: 0; }
+              img { width: 58mm; height: 40mm; display: block; }
             </style>
           </head>
           <body>
-            ${Array(labelData.quantity).fill(0).map(() => `
-              <div class="label">
-                <div class="store-name">${storeName}</div>
-                <div class="product-name">${labelData.product.name}</div>
-                ${labelData.barcode_image
-                  ? `<img src="${labelData.barcode_image}" alt="Barcode" class="barcode" />`
-                  : `<div class="sku">SKU: ${labelData.product.sku}</div>`
-                }
-                <div class="price">${labelData.price.formatted_price} ${labelData.price.currency}</div>
-              </div>
-            `).join('')}
+            <img src="${imageData}" />
             <script>
               window.onload = () => {
-                // Увеличенная задержка для полной загрузки
                 setTimeout(() => {
                   window.print();
                   setTimeout(() => window.close(), 500);
-                }, 600);
+                }, 800);
               };
             </script>
           </body>
@@ -237,7 +189,7 @@ const Barcode = () => {
       }
     } catch (err) {
       console.error("❌ Ошибка:", err);
-      alert("Ошибка при получении данных этикетки");
+      alert("Ошибка при печати этикетки");
     }
   };
 
