@@ -52,7 +52,7 @@ const Inventory = () => {
   const [scannedCode, setScannedCode] = useState<string>("");
   const scanBarcode = useScanBarcode(scannedCode);
   const availableSizes = useAvailableSizes({
-    name: scanBarcode.data?.data?.product?.name?.split(" ")[0] || "",
+    name: scanBarcode.data?.data?.name?.split(" ")[0] || "",
   });
 
   const [userId, setUserId] = useState<number | string>("");
@@ -263,7 +263,7 @@ const Inventory = () => {
         }}
         width={964}
         height={634}
-        headTitle={scanBarcode.data?.data?.product?.name || ""}
+        headTitle={scanBarcode.data?.data?.name || ""}
         overflowY="scroll"
       >
         <ul className={styles.sizes__list}>

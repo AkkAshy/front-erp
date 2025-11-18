@@ -9,7 +9,7 @@ const ShiftStatus: FC = () => {
   const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
   const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
 
-  const shift = currentShift?.data;
+  const shift = currentShift;
 
   if (isLoading) {
     return (

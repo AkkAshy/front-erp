@@ -14,7 +14,7 @@ import type {
 
 /**
  * Scan barcode and auto-create/update draft sale
- * POST /api/sales/scan-item/
+ * POST /api/sales/scan_item/
  */
 export const useScanItem = () => {
   const queryClient = useQueryClient();
@@ -39,7 +39,9 @@ export const useCurrentSale = (session: number | null) => {
   return useQuery<CurrentSaleResponse>({
     queryKey: ["currentSale", session],
     queryFn: async () => {
+      console.log('📦 Fetching current sale for session:', session);
       const response = await salesApi.getCurrentSale(session!);
+      console.log('📦 Current sale response:', response.data);
       return response.data;
     },
     enabled: !!session, // Only fetch if session exists

@@ -12,14 +12,6 @@ import styles from "./History.module.scss";
 import TablePagination from "@/shared/ui/Pagination";
 import { usePagination } from "@/shared/lib/hooks/usePagination";
 
-const paymentMethods: Record<string, string> = {
-  cash: "Naqd pul",
-  debt: "Qarz",
-  card: "Karta",
-  transfer: "O'tkazma",
-  hybrid: "Gibrid",
-};
-
 const headCols = [
   "#",
   "Savdo sanasi",
@@ -92,23 +84,27 @@ const History = () => {
             return {
               id: item.id,
               index: index + 1 + offset,
-              date: format(parseISO(item.created_at), "dd.MM.yyyy-HH:mm"), //<------------date
-              transactions_id: item.transaction,
+              date: format(parseISO(item.created_at), "dd.MM.yyyy-HH:mm"),
+              transactions_id: item.receipt_number || item.id,
               status:
-                item.action === "completed" ? (
+                item.status === "completed" ? (
                   <span className={styles.status__сompleted}>Yakunlangan</span>
-                ) : (
+                ) : item.status === "pending" ? (
+                  <span className={styles.status__pending}>Kutilmoqda</span>
+                ) : item.status === "cancelled" ? (
                   <span className={styles.status__сancelled}>
                     Bekor qilingan
                   </span>
+                ) : (
+                  <span className={styles.status__сancelled}>
+                    {item.status_display || "Noma'lum"}
+                  </span>
                 ),
-              cashier: item.parsed_details?.cashier || "Не указан",
-              items_count: item.parsed_details?.items[0].quantity || 0,
-              payment_method: item.parsed_details?.payment_method
-                ? paymentMethods[item.parsed_details.payment_method]
-                : "Не указан",
+              cashier: item.cashier_name || "Не указан",
+              items_count: item.total_quantity ? parseFloat(item.total_quantity).toFixed(0) : 0,
+              payment_method: "Не указан", // TODO: Нужно добавить информацию о платеже из другого источника
               total_amount:
-                (Number(item.parsed_details?.total_amount) || 0).toLocaleString(
+                (Number(item.total_amount) || 0).toLocaleString(
                   "de-DE"
                 ) + " uzs",
             };

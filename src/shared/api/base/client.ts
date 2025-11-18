@@ -14,6 +14,7 @@ api.interceptors.request.use((config) => {
     url: config.url,
     baseURL: config.baseURL,
     fullUrl: `${config.baseURL}${config.url}`,
+    params: config.params,
     data: config.data,
   });
   return config;

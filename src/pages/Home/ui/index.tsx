@@ -29,7 +29,8 @@ import styles from "./Home.module.scss";
 const headCols = ["#", "Kategoriya", "Tovar nomi", "Artikul (SKU)", "O'lchov birligi", "Soni", "Narx", ""];
 
 const Home = () => {
-  const [scannedCode, setScannedCode] = useState<string>("");
+  const [barcodeInput, setBarcodeInput] = useState<string>("");  // Для input поля
+  const [scannedCode, setScannedCode] = useState<string>("");     // Для API запроса
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"cash" | "card" | "transfer">("cash");
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
@@ -43,7 +44,14 @@ const Home = () => {
 
   // Get current shift
   const currentShift = useCurrentShift();
-  const sessionId = currentShift.data?.data?.id || null;
+  const sessionId = currentShift.data?.id || null;
+
+  // Debug: Log session info
+  useEffect(() => {
+    console.log('🔍 Current shift data:', currentShift.data);
+    console.log('🔍 Session ID:', sessionId);
+    console.log('🔍 Shift status:', currentShift.data?.status);
+  }, [currentShift.data, sessionId]);
 
   // Simplified POS hooks
   const scanItem = useScanItem();
@@ -52,24 +60,40 @@ const Home = () => {
   const checkout = useCheckout();
 
   // Scan barcode to find product
+  console.log('🔄 Component render - scannedCode:', scannedCode);
   const scanBarcode = useScanBarcode(scannedCode, !!scannedCode);
 
   // Get current sale data
-  // useCurrentSale теперь возвращает CurrentSaleResponse напрямую (не обернутый в { data })
-  const sale = currentSale.data?.data?.sale;
+  // ИСПРАВЛЕНО: CurrentSaleResponse.data содержит Sale напрямую (не обернутый в { sale: ... })
+  const sale = currentSale.data?.data;  // data содержит Sale | null
   const items = sale?.items || [];
   const totalAmount = parseFloat(sale?.total_amount || "0");
   const totalProductCount = items.reduce((acc: number, item: { quantity: string }) => acc + parseFloat(item.quantity), 0);
 
+  // Debug: Log current sale data
+  useEffect(() => {
+    console.log('📊 Current sale data:', {
+      hasData: !!currentSale.data,
+      sale: sale,
+      itemsCount: items.length,
+      totalAmount,
+      rawData: currentSale.data
+    });
+  }, [currentSale.data, sale, items.length, totalAmount]);
+
   // Handle barcode scan - двухшаговый процесс
   const handleScan = useCallback(
     (code: string) => {
+      console.log('🔍 Barcode scanned:', code);
+
       if (!sessionId) {
+        console.log('❌ No session - shift not open');
         setErrorMessage("Iltimos, avval smenani oching!");
         setShowErrorNotification(true);
         return;
       }
 
+      console.log('✅ Session exists, setting scanned code:', code);
       setScannedCode(code);
     },
     [sessionId]
@@ -77,32 +101,56 @@ const Home = () => {
 
   // Когда товар найден по barcode, добавляем его в продажу
   useEffect(() => {
-    if (scanBarcode.data?.data?.product && sessionId) {
-      const product = scanBarcode.data.data.product;
+    // ИСПРАВЛЕНО: Backend возвращает товар напрямую в data, а не в data.product
+    const product = scanBarcode.data?.data;
 
-      // Добавляем товар в продажу используя ID товара
+    console.log('🔎 Barcode scan effect triggered:', {
+      hasProduct: !!product,
+      product: product,
+      sessionId,
+      scannedCode,
+      isError: scanBarcode.isError,
+      isLoading: scanBarcode.isLoading
+    });
+
+    if (product && sessionId && scannedCode) {
+      console.log('🛒 Product found, adding to sale:', {
+        sessionId,
+        productId: product.id,
+        productName: product.name,
+        barcode: scannedCode
+      });
+
+      // Очищаем код СРАЗУ чтобы не было повторных вызовов
+      setScannedCode("");
+      setBarcodeInput("");
+
+      // Используем scan_item endpoint который автоматически создает/обновляет продажу
       scanItem.mutate(
         {
           session: sessionId,
-          product: product.id,  // ID товара
+          product: product.id,
           quantity: 1,
           batch: null,
         },
         {
-          onSuccess: () => {
-            setScannedCode("");
+          onSuccess: (data) => {
+            console.log('✅ Scan item SUCCESS:', data);
           },
           onError: (error: any) => {
+            console.error('❌ Scan item ERROR:', error);
+            console.error('❌ Error response:', error?.response?.data);
             setErrorMessage(error?.response?.data?.message || "Xatolik yuz berdi");
             setShowErrorNotification(true);
-            setScannedCode("");
           },
         }
       );
     } else if (scanBarcode.isError && scannedCode) {
+      console.log('❌ Product not found for barcode:', scannedCode);
       setErrorMessage("Mahsulot topilmadi");
       setShowErrorNotification(true);
       setScannedCode("");
+      setBarcodeInput("");
     }
   }, [scanBarcode.data, scanBarcode.isError, sessionId, scanItem, scannedCode]);
 
@@ -197,6 +245,34 @@ const Home = () => {
         <header className={styles.header}>
           <PageTitle>Kassa</PageTitle>
           <div className={styles.header__btns}>
+            {/* Barcode scanner input */}
+            <input
+              type="text"
+              value={barcodeInput}
+              onChange={(e) => {
+                const code = e.target.value;
+                console.log('📝 Barcode input changed:', code, 'length:', code.length);
+                setBarcodeInput(code);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && barcodeInput) {
+                  console.log('⏎ Enter pressed, scanning barcode:', barcodeInput);
+                  e.preventDefault();
+                  handleScan(barcodeInput);
+                  setBarcodeInput("");
+                }
+              }}
+              placeholder="Shtrix-kod skanerlang..."
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '6px',
+                fontSize: '14px',
+                width: '200px',
+                marginRight: '12px'
+              }}
+              autoFocus
+            />
             <span onClick={handleClearAll}>
               <CloseIcon />
             </span>

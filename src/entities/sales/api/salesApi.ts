@@ -5,13 +5,13 @@ export const salesApi = {
   // ===== SIMPLIFIED POS WORKFLOW (УПРОЩЕННЫЙ WORKFLOW) =====
 
   // Scan item - auto-create or update draft sale
-  // POST /api/sales/sales/scan-item/
+  // POST /api/sales/sales/scan_item/
   scanItem: (data: {
     session: number;
     product: number;  // ID товара
     quantity?: number;
     batch?: number | null;
-  }) => api.post("/sales/sales/scan-item/", data),
+  }) => api.post("/sales/sales/scan_item/", data),
 
   // Get current pending sale
   // GET /api/sales/sales/current/?session={session_id}

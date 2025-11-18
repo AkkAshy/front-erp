@@ -14,27 +14,17 @@ export type ScanItemRequest = {
   batch?: number | null;
 };
 
-// Scan item response
+// Scan item response - ИСПРАВЛЕНО согласно реальному API
 export type ScanItemResponse = {
   status: "success";
   message: string;
-  data: {
-    sale: Sale;  // Текущая pending продажа (созданная или обновленная)
-    item_added: {
-      product_id: number;
-      product_name: string;
-      quantity: number;
-      unit_price: number;
-    };
-  };
+  data: Sale;  // Возвращает sale напрямую, не обернутый в { sale: ... }
 };
 
-// Current sale response
+// Current sale response - ИСПРАВЛЕНО согласно реальному API
 export type CurrentSaleResponse = {
   status: "success";
-  data: {
-    sale: Sale | null;  // null если нет pending продажи
-  };
+  data: Sale | null;  // null если нет pending продажи, иначе Sale напрямую
 };
 
 // Add item to sale request
@@ -242,15 +232,36 @@ type ParsedDetails = {
   }>;
 };
 
+// Legacy type - старая структура транзакций
 export type Transaction = {
   count: number;
   next: string | null;
   previous: string | null;
   results: Array<{
     id: number;
-    transaction: number;
-    action: string;
-    parsed_details: ParsedDetails;
+    session: number;
+    session_info: string;
+    cashier_name: string;
+    receipt_number: string;
+    status: SaleStatus;
+    status_display: string;
+    customer: number | null;
+    customer_info: any | null;
+    customer_name: string;
+    customer_phone: string;
+    subtotal: string;
+    discount_amount: string;
+    discount_percent: string;
+    tax_amount: string;
+    total_amount: string;
+    items_count: number;
+    total_quantity: string;
+    notes: string;
     created_at: string;
+    completed_at: string | null;
+    // Legacy fields для обратной совместимости
+    transaction?: number;
+    action?: string;
+    parsed_details?: ParsedDetails;
   }>;
 };
