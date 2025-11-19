@@ -12,34 +12,39 @@ export const buildSummaryItems = (
 ) => {
   const { total_amount, total_transactions, total_items_sold } = totals;
 
+  // Безопасное преобразование значений (на случай если они null или undefined)
+  const safeAmount = total_amount ?? 0;
+  const safeTransactions = total_transactions ?? 0;
+  const safeItems = total_items_sold ?? 0;
+
   return [
     {
       id: 1,
       title: "Savdo summasi",
       change: percentGrowth(today.amount, yesterday.amount),
-      value: `${total_amount.toLocaleString("de-DE")} uzs`,
+      value: `${safeAmount.toLocaleString("de-DE")} uzs`,
     },
     {
       id: 2,
       title: "Cheklar soni",
       change: percentGrowth(today.transactions, yesterday.transactions),
-      value: `${total_transactions.toLocaleString("de-DE")} dona`,
+      value: `${safeTransactions.toLocaleString("de-DE")} dona`,
     },
     {
       id: 3,
       title: "Mahsulotlar soni",
       change: percentGrowth(today.items, yesterday.items),
-      value: `${total_items_sold.toLocaleString("de-DE")} dona`,
+      value: `${safeItems.toLocaleString("de-DE")} dona`,
     },
     {
       id: 4,
-      title: "O’rtacha chek narxi",
+      title: "O'rtacha chek narxi",
       change: percentGrowth(
         today.amount / today.transactions,
         yesterday.amount / yesterday.transactions
       ),
-      value: `${(total_transactions
-        ? Math.floor(total_amount / total_transactions)
+      value: `${(safeTransactions
+        ? Math.floor(safeAmount / safeTransactions)
         : 0
       ).toLocaleString("de-DE")} uzs`,
     },

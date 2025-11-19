@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import type { IconProps } from "@/shared/ui/icons/types";
 import CategoryIcon from "@/shared/ui/icons/ui/CategoryIcon";
 import SellerIcon from "@/shared/ui/icons/ui/SellerIcon";
+import UserSquareIcon from "@/shared/ui/icons/ui/UserSquareIcon";
 import {
   BarcodeIcon,
   MainIcon,
@@ -23,6 +24,7 @@ const sidebarItems = [
   { key: "payment", title: "To'lov turi" },
   { key: "barcode", title: "Bar kod" },
   { key: "seller", title: "Ishchilar" },
+  { key: "staff-credentials", title: "Kirish ma'lumotlari" },
 ];
 
 const iconsMap: Record<string, FC<IconProps>> = {
@@ -33,6 +35,7 @@ const iconsMap: Record<string, FC<IconProps>> = {
   payment: WalletIcon,
   barcode: BarcodeIcon,
   seller: SellerIcon,
+  "staff-credentials": UserSquareIcon,
 };
 
 type Props = {

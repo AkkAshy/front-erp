@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  useFilteredUsers,
-  useUser,
-} from "@/entities/cashier/model/useFilteredUsers";
+import { useUser } from "@/entities/cashier/model/useFilteredUsers";
+import { useEmployees } from "@/entities/cashier/model/useEmployees";
+import { useEmployee } from "@/entities/cashier/model/useEmployee";
 import { useCreateUser } from "@/entities/cashier/model/useCreateUser";
+import { useCreateEmployee } from "@/entities/cashier/model/useCreateEmployee";
 import { useUpdateUser } from "@/entities/cashier/model/useUpdateUser";
 import { useUpdateEmployee } from "@/entities/cashier/model/useUpdateEmployee";
+import { useUpdateEmployeeData } from "@/entities/cashier/model/useUpdateEmployeeData";
 import { useChangePassword } from "@/entities/cashier/model/useChangePassword";
 import { useToggleActiveUser } from "@/entities/cashier/model/useActiveUser";
 import DeleteConfirmModal from "@/features/DeleteConfirmModal/ui";
@@ -78,8 +79,10 @@ const Seller = () => {
   const [isActive, setIsActive] = useState(true);
   const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
+  const [createWithAccount, setCreateWithAccount] = useState(false);
 
-  const sellers = useFilteredUsers({ id: "", is_active: isActive });
+  // Используем useEmployees для получения всех сотрудников (и с User, и без)
+  const employees = useEmployees({ is_active: isActive });
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -109,11 +112,18 @@ const Seller = () => {
   const toggleActive = useToggleActiveUser();
   const [isToggling, setIsToggling] = useState(false);
   const createUser = useCreateUser();
+  const createEmployee = useCreateEmployee();
   const updateUser = useUpdateUser();
   const updateEmployee = useUpdateEmployee();
+  const updateEmployeeData = useUpdateEmployeeData();
   const changePassword = useChangePassword();
+
+  // Загружаем данные Employee (работает для всех сотрудников)
+  const currentEmployee = useEmployee(isOpenUpdate ? Number(updateId) : 0);
+
+  // Загружаем User данные только если у Employee есть связанный User
   const currentUser = useUser({
-    id: isOpenUpdate ? updateId : "",
+    id: isOpenUpdate && currentEmployee.data?.user ? currentEmployee.data.user : "",
   });
 
   function clearData() {
@@ -125,6 +135,7 @@ const Seller = () => {
     setEmail("");
     setError(null);
     setRole(null);
+    setCreateWithAccount(false);
   }
 
   function handleCreate() {
@@ -133,26 +144,30 @@ const Seller = () => {
       return;
     }
     if (phone.replace(/\D/g, "").length < 12) {
-      setError("Telefon raqamini to‘g‘ri kiriting");
+      setError("Telefon raqamini to'g'ri kiriting");
       return;
     }
 
-    if (!isEmail(email)) {
-      setError("Emailni to‘g‘ri kiriting");
-      return;
+    // Валидация для создания с User аккаунтом
+    if (createWithAccount) {
+      if (!isEmail(email)) {
+        setError("Emailni to'g'ri kiriting");
+        return;
+      }
+
+      if (!login.trim()) {
+        setError("Loginni kiriting");
+        return;
+      }
+
+      if (!isStrongPassword(password)) {
+        setError(
+          "Parol katta harf, raqam va kamida 6 ta belgidan iborat bo'lishi kerak"
+        );
+        return;
+      }
     }
 
-    if (!login.trim()) {
-      setError("Loginni kiriting");
-      return;
-    }
-
-    if (!isStrongPassword(password)) {
-      setError(
-        "Parol katta harf, raqam va kamida 6 ta belgidan iborat bo'lishi kerak"
-      );
-      return;
-    }
     if (!gender) {
       setError("Jinsni tanlang");
       return;
@@ -164,22 +179,46 @@ const Seller = () => {
     setError(null);
     const normalizedPhone = normalizePhone(phone);
 
-    createUser
-      .mutateAsync({
-        username: login,
-        password: password,
-        first_name: name,
-        phone: normalizedPhone,
-        sex: genderToBackend(gender),
-        email,
-        role: role || "cashier",
-      })
-      .then((res) => {
-        if (res.status === 201) {
-          setIsOpenCreate(false);
-          clearData();
-        }
-      });
+    // Разделяем имя на first_name и last_name
+    const nameParts = name.trim().split(/\s+/);
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    if (createWithAccount) {
+      // Создаём User с аккаунтом
+      createUser
+        .mutateAsync({
+          username: login,
+          password: password,
+          first_name: name,
+          phone: normalizedPhone,
+          sex: genderToBackend(gender),
+          email,
+          role: role || "cashier",
+        })
+        .then((res) => {
+          if (res.status === 201) {
+            setIsOpenCreate(false);
+            clearData();
+          }
+        });
+    } else {
+      // Создаём простого Employee без аккаунта
+      createEmployee
+        .mutateAsync({
+          first_name: firstName,
+          last_name: lastName,
+          phone: normalizedPhone,
+          role: (role as "cashier" | "stockkeeper" | "manager") || "cashier",
+          sex: genderToBackend(gender) === "male" ? "M" : genderToBackend(gender) === "female" ? "F" : undefined,
+        })
+        .then((res) => {
+          if (res.status === 201) {
+            setIsOpenCreate(false);
+            clearData();
+          }
+        });
+    }
   }
 
   function handleUpdate() {
@@ -192,23 +231,29 @@ const Seller = () => {
       return;
     }
 
-    if (!isEmail(email)) {
-      setError("Emailni to'g'ri kiriting");
-      return;
+    const hasUser = currentEmployee.data?.user;
+
+    // Валидация для Employee с User аккаунтом
+    if (hasUser) {
+      if (!isEmail(email)) {
+        setError("Emailni to'g'ri kiriting");
+        return;
+      }
+
+      if (!login.trim()) {
+        setError("Loginni kiriting");
+        return;
+      }
+
+      // Проверяем пароль только если он введён
+      if (password && !isStrongPassword(password)) {
+        setError(
+          "Parol katta harf, raqam va kamida 6 ta belgidan iborat bo'lishi kerak"
+        );
+        return;
+      }
     }
 
-    if (!login.trim()) {
-      setError("Loginni kiriting");
-      return;
-    }
-
-    // Проверяем пароль только если он введён
-    if (password && !isStrongPassword(password)) {
-      setError(
-        "Parol katta harf, raqam va kamida 6 ta belgidan iborat bo'lishi kerak"
-      );
-      return;
-    }
     if (!gender) {
       setError("Jinsni tanlang");
       return;
@@ -217,93 +262,114 @@ const Seller = () => {
     setError(null);
     const normalizedPhone = normalizePhone(phone);
 
-    // Определяем какие поля изменились
-    const profileChanges: any = {};
-    if (name !== originalData.name) profileChanges.first_name = name;
-    if (email !== originalData.email) profileChanges.email = email;
-    if (login !== originalData.login) profileChanges.username = login;
+    if (hasUser) {
+      // Обновляем Employee с User аккаунтом (используем старую логику)
+      const profileChanges: any = {};
+      if (name !== originalData.name) profileChanges.first_name = name;
+      if (email !== originalData.email) profileChanges.email = email;
+      if (login !== originalData.login) profileChanges.username = login;
 
-    const phoneChanged = normalizedPhone !== normalizePhone(originalData.phone);
-    const genderChanged = gender !== originalData.gender;
-    const passwordChanged = password && password.trim();
+      const phoneChanged = normalizedPhone !== normalizePhone(originalData.phone);
+      const genderChanged = gender !== originalData.gender;
+      const passwordChanged = password && password.trim();
 
-    // Проверяем что хотя бы что-то изменилось
-    const hasChanges = Object.keys(profileChanges).length > 0 || phoneChanged || genderChanged || passwordChanged;
+      const hasChanges = Object.keys(profileChanges).length > 0 || phoneChanged || genderChanged || passwordChanged;
 
-    if (!hasChanges) {
-      console.log("No changes detected, closing modal");
-      setIsOpenUpdate(false);
-      clearData();
-      return;
-    }
-
-    console.log("Detected changes:", {
-      profileChanges,
-      phoneChanged,
-      genderChanged,
-      passwordChanged,
-      updateId
-    });
-
-    // Создаём цепочку промисов
-    let updateChain = Promise.resolve({ status: 200 } as any);
-
-    // Шаг 1: Обновляем профиль только если есть изменения
-    if (Object.keys(profileChanges).length > 0) {
-      console.log("Will update profile:", profileChanges);
-      updateChain = updateChain.then(() =>
-        updateUser.mutateAsync({
-          id: updateId,
-          ...profileChanges,
-        })
-      );
-    }
-
-    // Шаг 2: Обновляем пароль только если он был введён
-    if (passwordChanged) {
-      console.log("Will update password");
-      updateChain = updateChain.then((res) => {
-        if (res.status === 200) {
-          return changePassword.mutateAsync({
-            id: updateId,
-            new_password: password,
-          });
-        }
-        throw new Error("Failed to update user");
-      });
-    }
-
-    // Шаг 3: Обновляем employee info (phone, sex) только если что-то изменилось
-    if (phoneChanged || genderChanged) {
-      const employeeChanges: any = {};
-      if (phoneChanged) employeeChanges.phone = normalizedPhone;
-      if (genderChanged) employeeChanges.sex = genderToBackend(gender);
-
-      console.log("Will update employee:", employeeChanges);
-      updateChain = updateChain.then((res) => {
-        if (res.status === 200) {
-          return updateEmployee.mutateAsync({
-            id: updateId,
-            ...employeeChanges,
-          });
-        }
-        throw new Error("Failed to change password");
-      });
-    }
-
-    // Выполняем цепочку и обрабатываем результат
-    updateChain
-      .then(() => {
-        console.log("Update successful, invalidating cache");
-        // Инвалидируем кэш только после успешного завершения всех обновлений
-        queryClient.invalidateQueries({ queryKey: ["users"] });
+      if (!hasChanges) {
         setIsOpenUpdate(false);
         clearData();
-      })
-      .catch((error) => {
-        console.error("Update error:", error);
-        setError("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
-      });
+        return;
+      }
+
+      let updateChain = Promise.resolve({ status: 200 } as any);
+
+      if (Object.keys(profileChanges).length > 0) {
+        updateChain = updateChain.then(() =>
+          updateUser.mutateAsync({
+            id: currentEmployee.data?.user!,
+            ...profileChanges,
+          })
+        );
+      }
+
+      if (passwordChanged) {
+        updateChain = updateChain.then((res) => {
+          if (res.status === 200) {
+            return changePassword.mutateAsync({
+              id: currentEmployee.data?.user!,
+              new_password: password,
+            });
+          }
+          throw new Error("Failed to update user");
+        });
+      }
+
+      if (phoneChanged || genderChanged) {
+        const employeeChanges: any = {};
+        if (phoneChanged) employeeChanges.phone = normalizedPhone;
+        if (genderChanged) employeeChanges.sex = genderToBackend(gender);
+
+        updateChain = updateChain.then((res) => {
+          if (res.status === 200) {
+            return updateEmployee.mutateAsync({
+              id: currentEmployee.data?.user!,
+              ...employeeChanges,
+            });
+          }
+          throw new Error("Failed to change password");
+        });
+      }
+
+      updateChain
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["users"] });
+          queryClient.invalidateQueries({ queryKey: ["employees"] });
+          setIsOpenUpdate(false);
+          clearData();
+        })
+        .catch((error) => {
+          console.error("Update error:", error);
+          setError("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+        });
+    } else {
+      // Обновляем Employee без User (используем updateEmployeeData)
+      const nameParts = name.trim().split(/\s+/);
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(" ") || "";
+
+      const employeeChanges: any = {};
+      if (firstName !== currentEmployee.data?.first_name) employeeChanges.first_name = firstName;
+      if (lastName !== currentEmployee.data?.last_name) employeeChanges.last_name = lastName;
+      if (normalizedPhone !== currentEmployee.data?.phone) employeeChanges.phone = normalizedPhone;
+
+      // Конвертируем gender в backend формат
+      const backendSex = genderToBackend(gender) === "male" ? "M" : genderToBackend(gender) === "female" ? "F" : undefined;
+      if (backendSex && backendSex !== currentEmployee.data?.sex) {
+        employeeChanges.sex = backendSex;
+      }
+
+      if (Object.keys(employeeChanges).length === 0) {
+        setIsOpenUpdate(false);
+        clearData();
+        return;
+      }
+
+      updateEmployeeData
+        .mutateAsync({
+          id: Number(updateId),
+          data: employeeChanges,
+        })
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["employees"] });
+          queryClient.invalidateQueries({ queryKey: ["cashiers"] });
+          setIsOpenUpdate(false);
+          clearData();
+        })
+        .catch((error) => {
+          console.error("Update error:", error);
+          setError("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+        });
+    }
   }
 
   function handleDelete(id: number) {
@@ -320,22 +386,19 @@ const Seller = () => {
   }
 
   useEffect(() => {
-    if (currentUser.data?.employee_info) {
+    if (!isOpenUpdate || !currentEmployee.data) return;
+
+    const employee = currentEmployee.data;
+    const hasUser = !!employee.user;
+
+    if (hasUser && currentUser.data?.employee_info) {
+      // У Employee есть связанный User - используем данные User
       const data = currentUser.data;
       const firstName = data.first_name ?? "";
       const phoneNumber = data.employee_info?.phone || "";
       const formattedPhone = phoneNumber ? format(phoneNumber.replace(/^\+998/, ""), maskOptions) : "";
       const emailValue = data.email ?? "";
       const usernameValue = data.username ?? "";
-
-      console.log("Loading user data for update:", {
-        updateId,
-        firstName,
-        phoneNumber,
-        formattedPhone,
-        emailValue,
-        usernameValue
-      });
 
       const backendGender = data.employee_info?.sex ?? "";
       const frontendGender = genderFromBackend(backendGender);
@@ -344,23 +407,45 @@ const Seller = () => {
       setPhone(formattedPhone);
       setEmail(emailValue);
       setLogin(usernameValue);
-      setPassword(""); // Пароль всегда пустой при загрузке
+      setPassword("");
       setGender(frontendGender);
 
-      // Сохраняем оригинальные значения
-      const originalValues = {
+      setOriginalData({
         name: firstName,
         phone: formattedPhone,
         email: emailValue,
         login: usernameValue,
-        password: "", // Пароль всегда пустой при загрузке
+        password: "",
         gender: frontendGender || "",
-      };
+      });
+    } else {
+      // Employee без User - используем данные напрямую из Employee
+      const fullName = employee.full_name || `${employee.first_name || ""} ${employee.last_name || ""}`.trim();
+      const phoneNumber = employee.phone || "";
+      const formattedPhone = phoneNumber ? format(phoneNumber.replace(/^\+998/, ""), maskOptions) : "";
 
-      console.log("Saving original data:", originalValues);
-      setOriginalData(originalValues);
+      // Конвертируем sex из "M"/"F" в "Erkak"/"Ayol"
+      let frontendGender: Gender | string = "";
+      if (employee.sex === "M") frontendGender = "Erkak";
+      else if (employee.sex === "F") frontendGender = "Ayol";
+
+      setName(fullName);
+      setPhone(formattedPhone);
+      setEmail(""); // Employee без User не имеет email
+      setLogin(""); // Employee без User не имеет login
+      setPassword("");
+      setGender(frontendGender);
+
+      setOriginalData({
+        name: fullName,
+        phone: formattedPhone,
+        email: "",
+        login: "",
+        password: "",
+        gender: frontendGender || "",
+      });
     }
-  }, [currentUser.data, updateId, isOpenUpdate]);
+  }, [currentEmployee.data, currentUser.data, updateId, isOpenUpdate]);
 
   return (
     <div className={styles.seller}>
@@ -402,14 +487,14 @@ const Seller = () => {
           "",
           "",
         ]}
-        bodyCols={sellers.data?.map((item, index) => ({
+        bodyCols={employees.data?.results.map((item, index) => ({
           id: item.id,
           key: `${index + 1}.`,
-          first_name: item.first_name,
-          phone: item.employee_info?.phone || "-",
-          role: item.employee_info?.role_display || item.employee_info?.role || "-",
-          login: item.username,
-          password: item.password ?? "-",
+          first_name: item.full_name || `${item.first_name || ""} ${item.last_name || ""}`.trim() || "-",
+          phone: item.phone || "-",
+          role: item.role_display || item.role || "-",
+          login: item.user ? "User ID: " + item.user : "-",
+          password: "-",
           content_1: (
             <div
               onClick={() => {
@@ -458,7 +543,7 @@ const Seller = () => {
                 width={32}
                 height={32}
                 stroke="#8E51FF"
-                selected={!item.is_active_in_store}
+                selected={!item.is_active}
               />
             </div>
           ),
@@ -483,9 +568,9 @@ const Seller = () => {
             className: styles.delete__btn,
           },
         }}
-        isLoading={sellers.isLoading}
+        isLoading={employees.isLoading}
       />
-      {sellers.data?.length === 0 && (
+      {(employees.data?.results.length === 0 || !employees.data) && (
         <div className={styles.empty}>
           <img src="/empty.svg" alt="empty" />
         </div>
@@ -518,6 +603,26 @@ const Seller = () => {
           }
         }}
       >
+        {!isOpenUpdate && (
+          <div className={styles.checkbox} style={{ marginBottom: '16px' }}>
+            <ConfigProvider
+              theme={{
+                token: {
+                  colorPrimary: "#8E51FF",
+                },
+              }}
+            >
+              <Checkbox
+                checked={createWithAccount}
+                onChange={(e) => setCreateWithAccount(e.target.checked)}
+              />
+            </ConfigProvider>
+            <span className={styles.text} style={{ fontSize: '16px' }}>
+              Login va parol bilan akkaunt yaratish
+            </span>
+          </div>
+        )}
+
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -538,50 +643,65 @@ const Seller = () => {
               placeholder="+998 (__) ___-__-__"
             />
           </div>
-          <div className={styles.input__wrapper}>
-            <p className={styles.label__input}>Email</p>
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              placeholder="example@gmail.com"
-            />
-          </div>
+          {createWithAccount && !isOpenUpdate && (
+            <div className={styles.input__wrapper}>
+              <p className={styles.label__input}>Email</p>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="example@gmail.com"
+              />
+            </div>
+          )}
+          {isOpenUpdate && (
+            <div className={styles.input__wrapper}>
+              <p className={styles.label__input}>Email</p>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="example@gmail.com"
+              />
+            </div>
+          )}
         </div>
 
-        <div className={styles.form__wrapper}>
-          <div className={styles.input__wrapper}>
-            <p className={styles.label__input}>Login</p>
-            <input
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
-              type="text"
-              placeholder="username"
-              autoComplete="off"
-            />
-          </div>
-
-          <div className={styles.input__wrapper}>
-            <p className={styles.label__input}>
-              Parol {isOpenUpdate && <span style={{ opacity: 0.6, fontSize: '12px' }}>(bo'sh qoldiring o'zgartirmaslik uchun)</span>}
-            </p>
-            <div className={styles.password}>
+        {(createWithAccount || isOpenUpdate) && (
+          <div className={styles.form__wrapper}>
+            <div className={styles.input__wrapper}>
+              <p className={styles.label__input}>Login</p>
               <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type={showPassword ? "text" : "password"}
-                placeholder={isOpenUpdate ? "Yangi parol (ixtiyoriy)" : "password"}
-                autoComplete="new-password"
+                value={login}
+                onChange={(e) => setLogin(e.target.value)}
+                type="text"
+                placeholder="username"
+                autoComplete="off"
               />
-              <span
-                className={styles.password__icon}
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
-                <HideIcon selected={showPassword} />
-              </span>
+            </div>
+
+            <div className={styles.input__wrapper}>
+              <p className={styles.label__input}>
+                Parol {isOpenUpdate && <span style={{ opacity: 0.6, fontSize: '12px' }}>(bo'sh qoldiring o'zgartirmaslik uchun)</span>}
+              </p>
+              <div className={styles.password}>
+                <input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type={showPassword ? "text" : "password"}
+                  placeholder={isOpenUpdate ? "Yangi parol (ixtiyoriy)" : "password"}
+                  autoComplete="new-password"
+                />
+                <span
+                  className={styles.password__icon}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  <HideIcon selected={showPassword} />
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className={styles.form__wrapper}>
           <div className={styles.input__wrapper}>
@@ -613,14 +733,14 @@ const Seller = () => {
         type="success"
         message="Muvaffaqiyat"
         description="Ishchi qo'shildi!"
-        onOpen={createUser.isSuccess}
+        onOpen={createUser.isSuccess || createEmployee.isSuccess}
       />
 
       <Notification
         type="error"
         message="Xatolik"
         description="Ishchi qo'shilmadi!"
-        onOpen={createUser.isError}
+        onOpen={createUser.isError || createEmployee.isError}
       />
 
       <Notification

@@ -103,6 +103,15 @@ export const salesApi = {
     limit?: number;
   }) => api.get("/sales/sale-items/", { params }),
 
+  // ===== CASHIER STATS (СТАТИСТИКА КАССИРОВ) =====
+
+  // Получить статистику кассиров - GET /api/sales/sessions/cashier-stats/
+  getCashierStats: (params?: {
+    date_from?: string;  // ISO формат с timezone
+    date_to?: string;    // ISO формат с timezone
+    limit?: number;      // Топ-N кассиров
+  }) => api.get("/sales/sessions/cashier-stats/", { params }),
+
   // ===== LEGACY (старые эндпоинты для совместимости) =====
 
   // Старый эндпоинт для истории транзакций

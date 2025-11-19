@@ -10,6 +10,7 @@ import { useSalesSummary } from "@/entities/analytics/model/useSalesSummary";
 import { useTopProducts } from "@/entities/analytics/model/useTopProducts";
 import { useTopCustomers } from "@/entities/analytics/model/useTopCustomers";
 import { useTransactionsByDay } from "@/entities/analytics/model/useTransactionsByDay";
+import { useCashierStats } from "@/entities/cashier/model/useCashierStats";
 import { getToday, getYesterday } from "@/shared/lib/date/date";
 import { mapPaymentSummary } from "@/shared/lib/utils/mapPaymentSummary";
 import { buildSummaryItems } from "@/shared/lib/utils/buildSummaryItems";
@@ -79,6 +80,13 @@ const Statistics = () => {
   // useTopCustomers получает топ клиентов из customer-analytics и сортирует по monetary
   const topCustomers = useTopCustomers(5);
 
+  // Top cashiers stats
+  const topCashiers = useCashierStats({
+    dateFrom: fromDate || getToday(),
+    dateTo: toDate || getToday(),
+    limit: 5,
+  });
+
   const transactionsByDay = useTransactionsByDay({
     date_from: fromDate || getToday(),
     date_to: toDate || getToday(),
@@ -99,12 +107,6 @@ const Statistics = () => {
     end_date: getYesterday(),
   });
 
-  const {
-    total_amount = 0,
-    total_items_sold = 0,
-    total_transactions = 0,
-  } = getTodaySummary.data ?? {};
-
   const today = {
     amount: getTodaySummary.data?.total_amount ?? 0,
     transactions: getTodaySummary.data?.total_transactions ?? 0,
@@ -118,9 +120,9 @@ const Statistics = () => {
   };
 
   const summaryItems = buildSummaryItems(today, yesterday, {
-    total_amount,
-    total_transactions,
-    total_items_sold,
+    total_amount: paymentSummary.data?.total_amount ?? 0,
+    total_transactions: paymentSummary.data?.total_transactions ?? 0,
+    total_items_sold: paymentSummary.data?.total_items_sold ?? 0,
   });
 
   const paymentItems = mapPaymentSummary(
@@ -336,6 +338,43 @@ const Statistics = () => {
                   </div>
                   <span className={styles.item__price}>
                     {item.total_purchases?.toLocaleString?.("de-DE")} uzs
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className={styles.dashboard__card}>
+          <header className={styles.dashboard__header}>
+            <div className={styles.title}>
+              <h1>Top kassirlar</h1>
+              <p className={styles.top5}>Top 5</p>
+            </div>
+            <p
+              className={styles.top__link}
+              onClick={() => navigate("/cashier-stats")}
+            >
+              Kassirlar
+              <span>
+                <ArrowRightIcon />
+              </span>
+            </p>
+          </header>
+          {(topCashiers.data?.data?.cashiers.length ?? 0) < 1 ? (
+            <div className={styles.loader}>
+              <img src="/stats-loading.svg" alt="" />
+            </div>
+          ) : (
+            <ul className={styles.dashboard__list}>
+              {topCashiers.data?.data?.cashiers.map((cashier, index) => (
+                <li key={cashier.id} className={styles.item}>
+                  <div className={styles.list__title}>
+                    <span className={styles.item__index}>{index + 1}.</span>
+                    <p className={styles.name}>{cashier.full_name}</p>
+                  </div>
+                  <span className={styles.item__price}>
+                    {parseFloat(cashier.total_sales).toLocaleString("de-DE")} uzs
                   </span>
                 </li>
               ))}

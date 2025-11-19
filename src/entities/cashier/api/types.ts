@@ -83,3 +83,115 @@ export type UserInfo = {
 };
 
 export type Gender = "Erkak" | "Ayol" | null;
+
+// ===== CASHIER TYPES (Кассиры) =====
+// Соответствует API: GET /api/users/employees/cashiers/
+
+export type Cashier = {
+  id: number;
+  full_name: string;
+  phone: string;
+  role: string;
+  photo?: string | null;
+};
+
+export type CashiersResponse = {
+  status: "success";
+  data: Cashier[];
+};
+
+// ===== CASHIER STATS TYPES (Статистика кассиров) =====
+// Соответствует API: GET /api/sales/sessions/cashier-stats/
+
+export type CashierStat = {
+  id: number;
+  full_name: string;
+  phone: string;
+  role: string;
+  total_sales: string;  // Общая сумма продаж
+  cash_sales: string;   // Продажи наличными
+  card_sales: string;   // Продажи по карте
+  sales_count: number;  // Количество продаж
+  sessions_count: number; // Количество смен
+};
+
+export type CashierStatsResponse = {
+  status: "success";
+  data: {
+    period: {
+      from: string;
+      to: string;
+    };
+    cashiers: CashierStat[];
+    total_cashiers: number;
+  };
+};
+
+// ===== STAFF CREDENTIALS TYPES (Учетные данные общего аккаунта) =====
+// Соответствует API: GET /api/users/stores/staff-credentials/
+
+export type StaffCredentials = {
+  username: string;
+  password: string;
+  full_name: string;
+  is_active: boolean;
+  store_name: string;
+  tenant_key: string;
+  note: string;
+};
+
+export type StaffCredentialsResponse = {
+  status: "success";
+  data: StaffCredentials;
+};
+
+// ===== EMPLOYEE TYPES (Полное управление сотрудниками) =====
+// Соответствует API: GET /api/users/employees/
+
+export type Employee = {
+  id: number;
+  user: number | null;  // ID связанного User (null для простых кассиров)
+  store: number;
+  role: "owner" | "manager" | "cashier" | "stockkeeper" | "staff";
+  role_display: string;
+  phone: string;
+  photo: string | null;
+  position: string | null;
+  sex: "M" | "F" | null;
+  sex_display: string | null;
+  is_active: boolean;
+  hired_at: string;  // YYYY-MM-DD
+  created_at: string;
+  // Добавляем поля для отображения имени
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+};
+
+export type EmployeesListResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Employee[];
+};
+
+export type CreateEmployeeRequest = {
+  first_name: string;
+  last_name: string;
+  phone: string;
+  role: "cashier" | "stockkeeper" | "manager";
+  hired_at?: string;  // YYYY-MM-DD, optional
+  position?: string;
+  sex?: "M" | "F";
+  photo?: string;
+};
+
+export type UpdateEmployeeRequest = {
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  position?: string;
+  sex?: "M" | "F";
+  is_active?: boolean;
+  photo?: string;
+};

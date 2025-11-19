@@ -51,6 +51,8 @@ export type CheckoutRequest = {
   new_customer?: NewCustomerData;  // Создать нового покупателя
   customer_name?: string;  // Разовый покупатель
   customer_phone?: string;
+  // Cashier integration
+  cashier_id?: number;  // ID кассира выполняющего продажу
 };
 
 // New customer data for creating customer during sale

@@ -10,6 +10,7 @@ import CreateModal from "@/shared/ui/CreateModal";
 import ShiftStatus from "@/shared/ui/ShiftStatus";
 import { CustomerSearch } from "@/shared/ui/CustomerSearch";
 import { CreateCustomerModal } from "@/shared/ui/CreateCustomerModal";
+import CashierSelector from "@/shared/ui/CashierSelector";
 
 import { useBarcodeScanner } from "@/shared/lib/hooks/useBarcodeScanner";
 import { useCurrentShift } from "@/entities/sales/model/useCurrentShift";
@@ -22,6 +23,7 @@ import {
 import { usePagination } from "@/shared/lib/hooks/usePagination";
 import { useScanBarcode } from "@/entities/product/model/useScanBarcode";
 import type { Customer } from "@/entities/customer/api/types";
+import type { Cashier } from "@/entities/cashier/api/types";
 
 import { notifications } from "@/shared/config/notifications";
 import styles from "./Home.module.scss";
@@ -37,6 +39,7 @@ const Home = () => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCashier, setSelectedCashier] = useState<Cashier | null>(null);
   const [showCreateCustomerModal, setShowCreateCustomerModal] = useState(false);
   const [newCustomerPhone, setNewCustomerPhone] = useState("+998");
 
@@ -223,6 +226,8 @@ const Home = () => {
           ],
           // Attach customer if selected
           customer_id: selectedCustomer?.id,
+          // Attach cashier if selected
+          cashier_id: selectedCashier?.id,
         },
       },
       {
@@ -349,6 +354,17 @@ const Home = () => {
       <div className={styles.home__sidebar}>
         <div className={styles.home__sidebar__inner}>
           <div className={styles.inner__top}>
+            {/* Cashier selector */}
+            <div style={{ marginBottom: '16px' }}>
+              <p style={{ marginBottom: '8px', fontSize: '14px', color: '#64748b', fontWeight: '500' }}>
+                Kassir:
+              </p>
+              <CashierSelector
+                onSelect={setSelectedCashier}
+                selectedCashierId={selectedCashier?.id}
+              />
+            </div>
+
             {/* Customer search */}
             <div style={{ marginBottom: '16px' }}>
               <p style={{ marginBottom: '8px', fontSize: '14px', color: '#64748b', fontWeight: '500' }}>

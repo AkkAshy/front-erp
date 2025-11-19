@@ -1,11 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Attributes, Barcode, Payment, SettingsLayout, Sizes } from "@/pages/Settings";
+import { Attributes, Barcode, Payment, SettingsLayout, Sizes, StaffCredentials } from "@/pages/Settings";
 import Login from "@/pages/Auth";
 import Home from "@/pages/Home/ui";
 import History from "@/pages/History/ui";
 import Customers from "@/pages/Customers/ui";
 import Inventory from "@/pages/Inventory/ui";
 import Statistics from "@/pages/Statistics/ui";
+import CashierStats from "@/pages/Statistics/ui/CashierStats";
 import Category from "@/pages/Settings/ui/Category";
 import MainSettings from "@/pages/Settings/ui/Main";
 import Seller from "@/pages/Settings/ui/Seller";
@@ -34,6 +35,10 @@ export const appRouter = createBrowserRouter([
           {
             path: "statistics",
             element: <Statistics />,
+          },
+          {
+            path: "cashier-stats",
+            element: <CashierStats />,
           },
           {
             path: "customers",
@@ -82,6 +87,10 @@ export const appRouter = createBrowserRouter([
               {
                 path: "attributes",
                 element: <Attributes />,
+              },
+              {
+                path: "staff-credentials",
+                element: <StaffCredentials />,
               },
             ],
           },
