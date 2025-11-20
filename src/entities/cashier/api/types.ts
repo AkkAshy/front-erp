@@ -195,3 +195,65 @@ export type UpdateEmployeeRequest = {
   is_active?: boolean;
   photo?: string;
 };
+
+// ===== STORE TYPES (Управление магазинами) =====
+// Соответствует API: POST /api/users/stores/
+
+export type Store = {
+  id: number;
+  name: string;
+  slug: string;
+  tenant_key: string;
+  schema_name: string;
+  address?: string;
+  city?: string;
+  phone?: string;
+  email?: string;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CreateStoreRequest = {
+  name: string;
+  slug?: string;
+  address?: string;
+  city?: string;
+  phone?: string;
+  email?: string;
+  description?: string;
+};
+
+export type CreateStoreResponse = {
+  status: "success";
+  message: string;
+  data: {
+    store: Store;
+    staff_credentials: {
+      username: string;
+      password: string;
+      note: string;
+    };
+  };
+};
+
+export type StoreWithCredentials = Store & {
+  staff_credentials: {
+    username: string;
+    password: string;
+    full_name: string;
+    is_active: boolean;
+    note: string;
+  } | null;
+  staff_credentials_missing?: boolean;
+  staff_credentials_note?: string;
+};
+
+export type MyStoresResponse = {
+  status: "success";
+  data: {
+    count: number;
+    stores: StoreWithCredentials[];
+  };
+};

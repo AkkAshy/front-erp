@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DropIcon, MoonIcon, SunIcon } from "@/shared/ui/icons";
+import StoreSelector from "@/shared/ui/StoreSelector";
 
 import clsx from "clsx";
 
@@ -903,7 +904,10 @@ const MainSettings = () => {
 
   return (
     <div className={styles.main__settings}>
-      <h3>Asosiy sozlamalar</h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+        <h3>Asosiy sozlamalar</h3>
+        <StoreSelector />
+      </div>
       <ul className={styles.theme__methods}>
         {themeMethods.map((item) => (
           <li

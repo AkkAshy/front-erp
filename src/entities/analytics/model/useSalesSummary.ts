@@ -1,16 +1,41 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { analyticsApi } from "../api/analyticsApi";
 import type { PaymentSummaryResponse, PeriodReportResponse } from "../api/types";
+import { getTenantKey } from "@/shared/api/auth/tokenService";
 
 export const useSalesSummary = (params: {
   start_date: string;
   end_date: string;
-}): UseQueryResult<PaymentSummaryResponse, Error> =>
-  useQuery({
-    queryKey: ["sales-summary", params],
+}): UseQueryResult<PaymentSummaryResponse, Error> => {
+  const tenantKey = getTenantKey();
+
+  return useQuery({
+    queryKey: ["sales-summary", tenantKey, params], // Добавили tenant_key для разделения кэша
+    enabled: !!tenantKey, // Выполнять запрос только если tenant_key есть
+    staleTime: 0, // Данные сразу считаются устаревшими
+    refetchOnMount: true, // Всегда перезапрашивать при монтировании
     queryFn: async () => {
       const res = await analyticsApi.getPeriodReport(params.start_date, params.end_date);
       const data: PeriodReportResponse = res.data;
+
+      // ⭐ Валидация: проверяем, что данные от правильного магазина
+      console.log("📊 Sales Summary Data:", {
+        expectedTenantKey: tenantKey,
+        receivedTenantKey: data.tenant_key,
+        storeName: data.store_name,
+        period: data.period,
+        match: data.tenant_key === tenantKey
+      });
+
+      if (data.tenant_key && data.tenant_key !== tenantKey) {
+        console.error(
+          `❌ Tenant key mismatch!`,
+          `\nExpected: ${tenantKey}`,
+          `\nGot: ${data.tenant_key}`,
+          `\nStore: ${data.store_name}`
+        );
+        throw new Error("Tenant key mismatch - data from wrong store");
+      }
 
       // Проверяем наличие данных
       if (!data || !data.totals || !data.daily_reports) {
@@ -72,3 +97,4 @@ export const useSalesSummary = (params: {
       };
     },
   });
+};

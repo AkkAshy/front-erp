@@ -1,5 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { analyticsApi } from "../api/analyticsApi";
+import { getTenantKey } from "@/shared/api/auth/tokenService";
 
 // API возвращает данные из customer-analytics
 type CustomerAnalyticsItem = {
@@ -28,9 +29,14 @@ type TopCustomers = {
   limit: number;
 };
 
-export const useTopCustomers = (limit: number = 5): UseQueryResult<TopCustomers, Error> =>
-  useQuery({
-    queryKey: ["top-customers", limit],
+export const useTopCustomers = (limit: number = 5): UseQueryResult<TopCustomers, Error> => {
+  const tenantKey = getTenantKey();
+
+  return useQuery({
+    queryKey: ["top-customers", tenantKey, limit], // Добавили tenant_key для разделения кэша
+    enabled: !!tenantKey, // Выполнять запрос только если tenant_key есть
+    staleTime: 0, // Данные сразу считаются устаревшими
+    refetchOnMount: true, // Всегда перезапрашивать при монтировании
     queryFn: () =>
       analyticsApi.getCustomerAnalytics().then((res: any) => {
         const results = res.data?.results || [];
@@ -53,3 +59,4 @@ export const useTopCustomers = (limit: number = 5): UseQueryResult<TopCustomers,
         };
       }),
   });
+};

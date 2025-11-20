@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Attributes, Barcode, Payment, SettingsLayout, Sizes, StaffCredentials } from "@/pages/Settings";
+import { Attributes, Barcode, Payment, SettingsLayout, Sizes } from "@/pages/Settings";
 import Login from "@/pages/Auth";
 import Home from "@/pages/Home/ui";
 import History from "@/pages/History/ui";
@@ -10,6 +10,7 @@ import CashierStats from "@/pages/Statistics/ui/CashierStats";
 import Category from "@/pages/Settings/ui/Category";
 import MainSettings from "@/pages/Settings/ui/Main";
 import Seller from "@/pages/Settings/ui/Seller";
+import StoreManagement from "@/pages/Settings/ui/StoreManagement";
 
 import { RegisterForm } from "@/features/Auth/Register/ui/RegisterForm";
 
@@ -89,8 +90,8 @@ export const appRouter = createBrowserRouter([
                 element: <Attributes />,
               },
               {
-                path: "staff-credentials",
-                element: <StaffCredentials />,
+                path: "store-management",
+                element: <StoreManagement />,
               },
             ],
           },

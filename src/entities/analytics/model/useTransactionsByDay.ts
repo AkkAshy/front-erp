@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { analyticsApi } from "../api/analyticsApi";
 import { format, parseISO } from "date-fns";
+import { getTenantKey } from "@/shared/api/auth/tokenService";
 
 type DailyReport = {
   id: number;
@@ -26,9 +27,14 @@ type DailyReport = {
 export const useTransactionsByDay = (params: {
   date_from: string;
   date_to: string;
-}) =>
-  useQuery({
-    queryKey: ["transactions-by-day", params],
+}) => {
+  const tenantKey = getTenantKey();
+
+  return useQuery({
+    queryKey: ["transactions-by-day", tenantKey, params], // Добавили tenant_key для разделения кэша
+    enabled: !!tenantKey, // Выполнять запрос только если tenant_key есть
+    staleTime: 0, // Данные сразу считаются устаревшими
+    refetchOnMount: true, // Всегда перезапрашивать при монтировании
     queryFn: () =>
       analyticsApi.getPeriodReport(params.date_from, params.date_to).then((res: any) => {
         // Новый формат API возвращает daily_reports
@@ -40,3 +46,4 @@ export const useTransactionsByDay = (params: {
         }));
       }),
   });
+};

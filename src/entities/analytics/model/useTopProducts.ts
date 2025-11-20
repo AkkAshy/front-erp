@@ -1,5 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { analyticsApi } from "../api/analyticsApi";
+import { getTenantKey } from "@/shared/api/auth/tokenService";
 
 // API возвращает product_name, но UI ожидает product__name
 type TopProductsResponse = {
@@ -30,9 +31,14 @@ type TopProduct = {
 export const useTopProducts = (params?: {
   limit?: number;
   order_by?: "revenue" | "quantity" | "profit";
-}): UseQueryResult<TopProduct, Error> =>
-  useQuery({
-    queryKey: ["top-products", params],
+}): UseQueryResult<TopProduct, Error> => {
+  const tenantKey = getTenantKey();
+
+  return useQuery({
+    queryKey: ["top-products", tenantKey, params], // Добавили tenant_key для разделения кэша
+    enabled: !!tenantKey, // Выполнять запрос только если tenant_key есть
+    staleTime: 0, // Данные сразу считаются устаревшими
+    refetchOnMount: true, // Всегда перезапрашивать при монтировании
     queryFn: () =>
       analyticsApi.getTopProducts(params).then((res: any) => {
         const data = res.data as TopProductsResponse;
@@ -47,3 +53,4 @@ export const useTopProducts = (params?: {
         };
       }),
   });
+};

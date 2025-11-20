@@ -1,6 +1,7 @@
 import { type FC } from "react";
 import Table from "@/shared/ui/Table";
 import { ConfigProvider, Switch } from "antd";
+import StoreSelector from "@/shared/ui/StoreSelector";
 
 import { setPaymentMethods } from "@/entities/appSettings/model/appSettingsSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -61,7 +62,10 @@ const Payment = () => {
 
   return (
     <div className={styles.payment}>
-      <h3>To’lov turi sozlamalari</h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+        <h3>To'lov turi sozlamalari</h3>
+        <StoreSelector />
+      </div>
       <Table
         headCols={["#", "To’lov turi", "Holati"]}
         bodyCols={paymentMethods.map((item, index) => ({

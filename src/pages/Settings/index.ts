@@ -5,5 +5,4 @@ export { default as Attributes } from "./ui/Attributes";
 export { default as Payment } from "./ui/Payment";
 export { default as Barcode } from "./ui/Barcode";
 export { default as Seller } from "./ui/Seller";
-export { default as StaffCredentials } from "./ui/StaffCredentials";
 export { default as SettingsLayout } from "./ui/Layout";

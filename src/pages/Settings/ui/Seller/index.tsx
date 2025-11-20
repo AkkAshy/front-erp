@@ -17,6 +17,7 @@ import Table from "@/shared/ui/Table";
 import CreateModal from "@/shared/ui/CreateModal";
 import SelectGender from "@/shared/ui/SelectGender";
 import DashedButton from "@/shared/ui/DashedButton";
+import StoreSelector from "@/shared/ui/StoreSelector";
 
 import { Checkbox, ConfigProvider } from "antd";
 
@@ -471,6 +472,14 @@ const Seller = () => {
             />
           </ConfigProvider>
         </span>
+      </div>
+
+      {/* ⭐ Выбор магазина для добавления работников */}
+      <div style={{ marginBottom: '20px' }}>
+        <p style={{ marginBottom: '8px', fontSize: '14px', color: '#666' }}>
+          Ishchi qo'shmoqchi bo'lgan do'konni tanlang:
+        </p>
+        <StoreSelector />
       </div>
 
       <DashedButton onClick={() => setIsOpenCreate(true)}>

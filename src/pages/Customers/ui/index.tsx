@@ -8,6 +8,7 @@ import {
 import Search from "@/shared/ui/Search";
 import Table from "@/shared/ui/Table";
 import PageTitle from "@/shared/ui/PageTitle";
+import StoreSelector from "@/shared/ui/StoreSelector";
 import { useFilteredCustomers } from "@/entities/customer/model/useFilteredCustomers";
 import type { Customer } from "@/entities/customer/api/types";
 
@@ -93,7 +94,10 @@ const Customers = () => {
         setIsOpenCalendar(false);
       }}
     >
-      <PageTitle>Mijozlar</PageTitle>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+        <PageTitle>Mijozlar</PageTitle>
+        <StoreSelector />
+      </div>
       <header className={styles.customers__header}>
         <Search
           value={search}

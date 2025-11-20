@@ -2,6 +2,7 @@ import { useState } from "react";
 import Table from "@/shared/ui/Table";
 import Search from "@/shared/ui/Search";
 import PageTitle from "@/shared/ui/PageTitle";
+import StoreSelector from "@/shared/ui/StoreSelector";
 import SelectSeller from "@/shared/ui/SelectSeller";
 import PeriodSelector from "@/shared/ui/PeriodSelector";
 import { useFilteredTransactions } from "@/entities/sales/model/useFilteredTransactions";
@@ -51,7 +52,10 @@ const History = () => {
         setIsOpenRangeCalendar(false);
       }}
     >
-      <PageTitle>Tarix</PageTitle>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+        <PageTitle>Tarix</PageTitle>
+        <StoreSelector />
+      </div>
       <header className={styles.history__header}>
         <Search
           type="number"

@@ -24,7 +24,8 @@ const sidebarItems = [
   { key: "payment", title: "To'lov turi" },
   { key: "barcode", title: "Bar kod" },
   { key: "seller", title: "Ishchilar" },
-  { key: "staff-credentials", title: "Kirish ma'lumotlari" },
+  // { key: "staff-credentials", title: "Kirish ma'lumotlari" }, // Удалено - дублирует функционал
+  { key: "store-management", title: "Do'konlar boshqaruvi" },
 ];
 
 const iconsMap: Record<string, FC<IconProps>> = {
@@ -36,6 +37,7 @@ const iconsMap: Record<string, FC<IconProps>> = {
   barcode: BarcodeIcon,
   seller: SellerIcon,
   "staff-credentials": UserSquareIcon,
+  "store-management": MainIcon, // Using MainIcon for now, can be changed to a store-specific icon
 };
 
 type Props = {

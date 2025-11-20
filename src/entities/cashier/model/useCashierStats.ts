@@ -1,6 +1,7 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { salesApi } from "@/entities/sales/api/salesApi";
 import type { CashierStatsResponse } from "../api/types";
+import { getTenantKey } from "@/shared/api/auth/tokenService";
 
 type UseCashierStatsParams = {
   dateFrom?: string;
@@ -12,8 +13,10 @@ type UseCashierStatsParams = {
 export const useCashierStats = (
   params?: UseCashierStatsParams
 ): UseQueryResult<CashierStatsResponse, Error> => {
+  const tenantKey = getTenantKey();
+
   return useQuery({
-    queryKey: ["cashierStats", params],
+    queryKey: ["cashierStats", tenantKey, params], // Добавили tenant_key для разделения кэша
     queryFn: async () => {
       const response = await salesApi.getCashierStats({
         date_from: params?.dateFrom,
@@ -22,7 +25,8 @@ export const useCashierStats = (
       });
       return response.data;
     },
-    enabled: params?.enabled !== false,
-    staleTime: 2 * 60 * 1000, // 2 минуты
+    enabled: params?.enabled !== false && !!tenantKey, // Выполнять только если tenant_key есть
+    staleTime: 0, // Данные сразу считаются устаревшими
+    refetchOnMount: true, // Всегда перезапрашивать при монтировании
   });
 };

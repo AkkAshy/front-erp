@@ -2,6 +2,7 @@ import { useState } from "react";
 import CreateModal from "@/shared/ui/CreateModal";
 import DashedButton from "@/shared/ui/DashedButton";
 import Notification from "@/shared/ui/Notification";
+import StoreSelector from "@/shared/ui/StoreSelector";
 import { useAttributeTypes } from "@/entities/attribute/model/useAttributeTypes";
 import { useCreateAttributeType } from "@/entities/attribute/model/useCreateAttributeType";
 import { useAttributeValues } from "@/entities/attribute/model/useAttributeValues";
@@ -98,7 +99,10 @@ const Attributes = () => {
   return (
     <div className={styles.attributes}>
       <div className={styles.header}>
-        <h2>Атрибуты товаров</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <h2>Атрибуты товаров</h2>
+          <StoreSelector />
+        </div>
         <DashedButton onClick={() => setIsOpenCreate(true)}>
           Добавить атрибут
         </DashedButton>

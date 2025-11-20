@@ -3,6 +3,7 @@ import { PrinterIcon } from "@/shared/ui/icons";
 import { useProducts } from "@/entities/product/model/useProducts";
 import type { ProductItem } from "@/entities/product/api/types";
 import { GenerateBarcode } from "@/shared/ui/GenerateBarcode";
+import StoreSelector from "@/shared/ui/StoreSelector";
 import axios from "axios";
 import JsBarcode from "jsbarcode";
 
@@ -207,7 +208,11 @@ const Barcode = () => {
 
   return (
     <div className={styles.barcode}>
-      <h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+        <h3>Bar kod sozlamalari</h3>
+        <StoreSelector />
+      </div>
+      <h3 style={{ display: 'none' }}>
         Bar kod sozlamalari
         {serverStatus === "online" && (
           <span style={{ color: "green" }}> ● Printer faol</span>

@@ -1,0 +1,156 @@
+.storeSelector {
+  position: relative;
+  z-index: 100;
+
+  .selector__button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: white;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 200px;
+
+    &:hover {
+      border-color: #8E51FF;
+      box-shadow: 0 2px 8px rgba(142, 81, 255, 0.1);
+    }
+
+    &.open {
+      border-color: #8E51FF;
+      box-shadow: 0 2px 8px rgba(142, 81, 255, 0.15);
+    }
+
+    .storeIcon {
+      font-size: 18px;
+    }
+
+    .storeName {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a1a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s;
+    }
+
+    &.open svg {
+      transform: rotate(180deg);
+    }
+  }
+
+  .backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99;
+  }
+
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 320px;
+    max-width: 400px;
+    background: white;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    z-index: 100;
+    overflow: hidden;
+    animation: slideDown 0.2s ease-out;
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dropdown__header {
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+
+      h4 {
+        margin: 0 0 4px 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+
+      p {
+        margin: 0;
+        font-size: 12px;
+        color: #999;
+        line-height: 1.4;
+      }
+    }
+
+    .storesList {
+      list-style: none;
+      margin: 0;
+      padding: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+
+      .storeItem {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #f5f5f5;
+        }
+
+        &.selected {
+          background: #f0e6ff;
+          border: 1px solid #8E51FF;
+        }
+
+        .storeItem__info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          flex: 1;
+
+          .storeItem__name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+          }
+
+          .storeItem__address {
+            font-size: 12px;
+            color: #999;
+          }
+        }
+
+        .checkmark {
+          font-size: 18px;
+          color: #8E51FF;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

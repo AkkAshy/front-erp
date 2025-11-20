@@ -6,6 +6,7 @@ import { DeleteIcon, EditIcon, MoreIcon } from "@/shared/ui/icons";
 import Notification from "@/shared/ui/Notification";
 import TablePagination from "@/shared/ui/Pagination";
 import DeleteConfirmModal from "@/features/DeleteConfirmModal/ui";
+import StoreSelector from "@/shared/ui/StoreSelector";
 
 // hooks
 import { useCreateCategory } from "@/entities/category/model/useCreateCategory";
@@ -60,7 +61,10 @@ const Category = () => {
 
   return (
     <div className={styles.category}>
-      <h3>Kategoriya sozlamalari</h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+        <h3>Kategoriya sozlamalari</h3>
+        <StoreSelector />
+      </div>
       <DashedButton
         onClick={() => {
           setIsOpenCategory(true);

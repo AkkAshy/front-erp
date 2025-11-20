@@ -4,6 +4,7 @@ import { DeleteIcon, EditIcon, MoreIcon, ScanIcon } from "@/shared/ui/icons";
 import Table from "@/shared/ui/Table";
 import Search from "@/shared/ui/Search";
 import PageTitle from "@/shared/ui/PageTitle";
+import StoreSelector from "@/shared/ui/StoreSelector";
 import CreateModal from "@/shared/ui/CreateModal";
 import DashedButton from "@/shared/ui/DashedButton";
 import SelectCategory from "@/shared/ui/SelectCategory";
@@ -98,7 +99,10 @@ const Inventory = () => {
         setIsOpenSellers(false);
       }}
     >
-      <PageTitle>Ombor</PageTitle>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+        <PageTitle>Ombor</PageTitle>
+        <StoreSelector />
+      </div>
       <div className={styles.action__btns}>
         <DashedButton onClick={() => setIsOpenCreate(true)}>
           + Yangi tovar yaratish

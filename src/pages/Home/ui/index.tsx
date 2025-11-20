@@ -11,6 +11,7 @@ import ShiftStatus from "@/shared/ui/ShiftStatus";
 import { CustomerSearch } from "@/shared/ui/CustomerSearch";
 import { CreateCustomerModal } from "@/shared/ui/CreateCustomerModal";
 import CashierSelector from "@/shared/ui/CashierSelector";
+import StoreSelector from "@/shared/ui/StoreSelector";
 
 import { useBarcodeScanner } from "@/shared/lib/hooks/useBarcodeScanner";
 import { useCurrentShift } from "@/entities/sales/model/useCurrentShift";
@@ -248,7 +249,10 @@ const Home = () => {
     <div className={styles.home}>
       <div className={styles.home__content}>
         <header className={styles.header}>
-          <PageTitle>Kassa</PageTitle>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <PageTitle>Kassa</PageTitle>
+            <StoreSelector />
+          </div>
           <div className={styles.header__btns}>
             {/* Barcode scanner input */}
             <input

@@ -13,13 +13,27 @@ export const attachAuthInterceptor = (api: ReturnType<typeof axios.create>) => {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // ⭐ Добавляем X-Tenant-Key для всех запросов (кроме регистрации и логина)
-    const isAuthEndpoint =
-      config.url?.includes('/auth/register') ||
-      config.url?.includes('/auth/login') ||
-      config.url?.includes('/auth/token/refresh');
+    // ⭐ Добавляем X-Tenant-Key для всех запросов (кроме регистрации, логина и управления списком магазинов)
+    // Примечание: config.url в axios - это относительный путь, может быть с или без начального слеша
+    const url = config.url || '';
+    const isExcludedEndpoint =
+      url.includes('/auth/register') ||
+      url.includes('/auth/login') ||
+      url.includes('/auth/token/refresh') ||
+      url.includes('/users/stores/my-stores-with-credentials') || // GET список магазинов владельца
+      url === '/users/stores/' ||          // POST /users/stores/ - создание магазина
+      url === 'users/stores/' ||           // Без начального слеша
+      url === '/users/stores' ||           // Без trailing slash
+      url === 'users/stores';              // Без обоих слешей
 
-    if (!isAuthEndpoint) {
+    console.log("🔍 Interceptor Check:", {
+      url: config.url,
+      isExcluded: isExcludedEndpoint,
+      willAddTenantKey: !isExcludedEndpoint,
+      tenantKey: !isExcludedEndpoint ? getTenantKey() : 'N/A'
+    });
+
+    if (!isExcludedEndpoint) {
       const tenantKey = getTenantKey();
       if (tenantKey) {
         config.headers['X-Tenant-Key'] = tenantKey;

@@ -2,9 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import SalesChart from "@/shared/ui/Charts/SalesChart";
 import PaymentChart from "@/shared/ui/Charts/PaymentChart";
 import PeriodSelector from "@/shared/ui/PeriodSelector";
+import StoreSelector from "@/shared/ui/StoreSelector";
 import DownloadIcon from "@/shared/ui/icons/ui/DownloadIcon";
 import PageTitle from "@/shared/ui/PageTitle";
 import { ArrowDownIcon, ArrowRightIcon, ClockIcon } from "@/shared/ui/icons";
+import { getTenantKey } from "@/shared/api/auth/tokenService";
 
 import { useSalesSummary } from "@/entities/analytics/model/useSalesSummary";
 import { useTopProducts } from "@/entities/analytics/model/useTopProducts";
@@ -147,6 +149,8 @@ const Statistics = () => {
     }
   }, [selectedRange]);
 
+  const storeSelected = !!getTenantKey();
+
   return (
     <div
       ref={ref}
@@ -158,7 +162,10 @@ const Statistics = () => {
     >
       <header className={styles.header}>
         <div className={styles.header__top}>
-          <PageTitle>Hisobotlar</PageTitle>
+          <div className={styles.header__left}>
+            <PageTitle>Hisobotlar</PageTitle>
+            <StoreSelector />
+          </div>
 
           <span
             className={styles.download__btn}
@@ -171,7 +178,7 @@ const Statistics = () => {
             <DownloadIcon />
           </span>
         </div>
-        <HorizontalDnd summaryItems={summaryItems} />
+        {storeSelected && <HorizontalDnd summaryItems={summaryItems} />}
 
         {/* <ul className={styles.summary__list}>
           {summaryItems.map((item, index) => (
@@ -191,6 +198,24 @@ const Statistics = () => {
         </ul> */}
       </header>
 
+      {!storeSelected && (
+        <div style={{
+          padding: '60px 20px',
+          textAlign: 'center',
+          background: '#f9f9f9',
+          borderRadius: '12px',
+          margin: '20px 0'
+        }}>
+          <h3 style={{ color: '#666', marginBottom: '10px' }}>
+            🏪 Do'kon tanlanmagan
+          </h3>
+          <p style={{ color: '#999', fontSize: '14px' }}>
+            Analitika ko'rish uchun yuqoridan do'kon tanlang
+          </p>
+        </div>
+      )}
+
+      {storeSelected && (<>
       <div className={styles.statistics__inner}>
         <div className={styles.statistics__filter}>
           <h1>Savdo</h1>
@@ -384,7 +409,7 @@ const Statistics = () => {
       </div>
 
       <div className={styles.payment__statistics}>
-        <h1>To’lov turlari</h1>
+        <h1>To'lov turlari</h1>
         <div className={styles.payment__inner}>
           <div className={styles.pie__chart}>
             <PaymentChart pieChartData={pieChartData} />
@@ -404,6 +429,7 @@ const Statistics = () => {
           </ul>
         </div>
       </div>
+      </>)}
     </div>
   );
 };

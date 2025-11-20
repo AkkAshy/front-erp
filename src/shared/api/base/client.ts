@@ -14,6 +14,10 @@ api.interceptors.request.use((config) => {
     url: config.url,
     baseURL: config.baseURL,
     fullUrl: `${config.baseURL}${config.url}`,
+    headers: {
+      'X-Tenant-Key': config.headers['X-Tenant-Key'],
+      'Authorization': config.headers.Authorization ? '***' : undefined,
+    },
     params: config.params,
     data: config.data,
   });
@@ -25,6 +29,8 @@ api.interceptors.response.use(
     console.log("✅ API Response:", {
       status: response.status,
       url: response.config.url,
+      tenant_key: response.data?.tenant_key || 'N/A',
+      store_name: response.data?.store_name || 'N/A',
       data: response.data,
     });
     return response;

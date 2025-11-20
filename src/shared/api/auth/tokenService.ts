@@ -24,6 +24,12 @@ export const setTenantKey = (tenantKey: string) => {
 };
 
 export const getTenantKey = () => {
+  // Prioritize selected store tenant key for owners with multiple stores
+  const selectedTenantKey = localStorage.getItem("selected_tenant_key");
+  if (selectedTenantKey) {
+    return selectedTenantKey;
+  }
+  // Fallback to default tenant key
   return localStorage.getItem("tenant_key");
 };
 
@@ -31,6 +37,8 @@ export const clearTokens = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("tenant_key");  // ⭐ Очищаем и tenant_key
+  localStorage.removeItem("selected_tenant_key");  // ⭐ Очищаем selected tenant key
+  localStorage.removeItem("selected_store_name");  // ⭐ Очищаем selected store name
 };
 
 export const refreshTokens = async (): Promise<string | null> => {

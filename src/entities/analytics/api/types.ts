@@ -36,6 +36,9 @@ export type DailyReport = {
 };
 
 export type PeriodReportResponse = {
+  tenant_key?: string;      // ⭐ Добавлено из бэкенда
+  store_name?: string;       // ⭐ Добавлено из бэкенда
+  store_slug?: string;       // ⭐ Добавлено из бэкенда
   period: {
     start_date: string;
     end_date: string;

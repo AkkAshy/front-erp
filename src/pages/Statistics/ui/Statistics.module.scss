@@ -11,6 +11,13 @@
     &__top {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+
+      .header__left {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
 
       .download__btn {
         height: 64px;
@@ -24,7 +31,7 @@
         cursor: pointer;
       }
     }
-    
+
   }
 
   &__inner {

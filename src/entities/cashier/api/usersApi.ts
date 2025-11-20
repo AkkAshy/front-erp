@@ -113,4 +113,20 @@ export const usersApi = {
     const { id, ...employeeData } = data;
     return api.patch(`/users/users/${id}/update-employee/`, employeeData);
   },
+
+  // ===== STORE MANAGEMENT (Управление магазинами) =====
+
+  // create new store (НЕ требуется X-Tenant-Key, только Authorization)
+  createStore: (data: {
+    name: string;
+    slug?: string;
+    address?: string;
+    city?: string;
+    phone?: string;
+    email?: string;
+    description?: string;
+  }) => api.post("/users/stores/", data),
+
+  // get all my stores with credentials (НЕ требуется X-Tenant-Key, только Authorization)
+  getMyStoresWithCredentials: () => api.get("/users/stores/my-stores-with-credentials/"),
 };
