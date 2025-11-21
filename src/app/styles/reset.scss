@@ -10,9 +10,16 @@
   font-family: "Sora", sans-serif;
 }
 
+html {
+  font-size: 14px; /* Уменьшенный базовый размер шрифта для более компактного интерфейса */
+  -webkit-text-size-adjust: 100%; /* Предотвращает автоматическое масштабирование текста в iOS */
+  -ms-text-size-adjust: 100%; /* Предотвращает автоматическое масштабирование текста в IE/Edge */
+}
+
 body {
   min-height: 100vh;
   color: #0e1621;
+  font-size: 14px; /* Размер шрифта по умолчанию для body */
 }
 
 button,
