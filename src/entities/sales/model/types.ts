@@ -40,12 +40,12 @@ export type RemoveItemRequest = {
   item_id: number;  // ID позиции в продаже (не product!)
 };
 
-// Checkout request - ИСПРАВЛЕНО согласно Postman
+// Checkout request - ИСПРАВЛЕНО согласно API документации
 export type CheckoutRequest = {
   payments: Array<{
     payment_method: "cash" | "card" | "transfer";  // payment_method, не method!
-    amount: number;
-    received_amount?: number;
+    amount: string | number;  // Бэкенд принимает и строку и число
+    received_amount?: string | number;  // Бэкенд принимает и строку и число
   }>;
   // Customer integration
   customer_id?: number;  // ID существующего покупателя
