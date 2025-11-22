@@ -110,8 +110,12 @@ const Sidebar = () => {
               <li
                 key={item.key}
                 onClick={() => {
-                  navigate(item.key === "home" ? "/" : item.key);
-                  setIsOpenSettingsSidebar(item.key === "settings");
+                  if (item.key === "settings") {
+                    setIsOpenSettingsSidebar(true);
+                  } else {
+                    navigate(item.key === "home" ? "/" : item.key);
+                    setIsOpenSettingsSidebar(false);
+                  }
                 }}
                 className={clsx(
                   styles.item,
