@@ -392,7 +392,7 @@ const Home = () => {
           total={items.length || 0}
           pageSize={limit}
           onChange={(p) => setPage(p)}
-          bottom={100}
+          bottom={20}
         />
 
         <footer className={styles.footer}>

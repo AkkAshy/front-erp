@@ -213,6 +213,7 @@ const Sizes = () => {
         total={filteredSizes.data?.data.count || 0}
         pageSize={limit}
         onChange={(p) => setPage(p)}
+        bottom={20}
       />
 
       <Notification
