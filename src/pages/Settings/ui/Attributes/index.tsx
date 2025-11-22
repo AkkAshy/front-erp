@@ -103,6 +103,9 @@ const Attributes = () => {
           <h2>Атрибуты товаров</h2>
           <StoreSelector />
         </div>
+      </div>
+
+      <div className={styles.addButtonWrapper}>
         <DashedButton onClick={() => setIsOpenCreate(true)}>
           Добавить атрибут
         </DashedButton>

@@ -384,11 +384,6 @@ const StoreManagement = () => {
           setSelectedStore(null);
         }}
         headTitle="Do'kon kirish ma'lumotlari"
-        btnTitle="Yopish"
-        btnOnClick={() => {
-          setShowStoreCredentials(false);
-          setSelectedStore(null);
-        }}
       >
         {selectedStore && (
           <div className={styles.credentials}>
