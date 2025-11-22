@@ -19,12 +19,14 @@ const TablePagination: FC<Props> = ({
   const style: React.CSSProperties = {
     width: "100%",
     height: "44px",
-    position: "absolute",
+    position: "fixed",
     left: 0,
     bottom,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 10,
+    backgroundColor: "#fff",
   };
   return (
     <div style={style}>
