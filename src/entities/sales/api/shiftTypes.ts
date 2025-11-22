@@ -1,23 +1,25 @@
 // Типы для смены кассира
 export type CashierShift = {
   id: number;
-  cashier: number;
+  cash_register: number;
+  cash_register_name: string;
+  cashier_full_name: string | null;
   cashier_name: string;
-  store: number;
-  store_name: string;
   status: "open" | "closed";
-  opening_balance: string;
-  closing_balance: string | null;
-  expected_balance: string;
+  status_display: string;
+  opening_cash: string;
+  expected_cash: string;
+  actual_cash: string | null;
+  cash_difference: string;
+  duration: number;
   total_sales: string;
-  total_cash_sales: string;
-  total_card_sales: string;
-  total_transfer_sales: string;
-  sales_count: number;
+  cash_sales: string;
+  card_sales: string;
+  notes: string;
   opened_at: string;
   closed_at: string | null;
-  balance_difference: string | null;
-  notes: string | null;
+  cash_movements: any[];
+  sales_count: number;
 };
 
 export type OpenShiftRequest = {

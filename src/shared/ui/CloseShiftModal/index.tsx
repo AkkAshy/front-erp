@@ -60,7 +60,7 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
 
   if (!shift) return null;
 
-  const expectedBalance = parseFloat(shift.expected_balance) || 0;
+  const expectedBalance = parseFloat(shift.expected_cash) || 0;
   const difference = closingBalance
     ? (parseFloat(closingBalance.replace(/\s/g, "").replace(/\u00A0/g, "")) || 0) - expectedBalance
     : 0;
@@ -84,7 +84,7 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Boshlang'ich balans:</span>
               <span className={styles.stat__value}>
-                {formatNumber(shift.opening_balance)} uzs
+                {formatNumber(shift.opening_cash)} uzs
               </span>
             </div>
 
@@ -98,28 +98,21 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Naqd pul:</span>
               <span className={styles.stat__value}>
-                {formatNumber(shift.total_cash_sales)} uzs
+                {formatNumber(shift.cash_sales)} uzs
               </span>
             </div>
 
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Karta:</span>
               <span className={styles.stat__value}>
-                {formatNumber(shift.total_card_sales)} uzs
-              </span>
-            </div>
-
-            <div className={styles.stat__item}>
-              <span className={styles.stat__label}>O'tkazma:</span>
-              <span className={styles.stat__value}>
-                {formatNumber(shift.total_transfer_sales)} uzs
+                {formatNumber(shift.card_sales)} uzs
               </span>
             </div>
 
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Kutilayotgan balans:</span>
               <span className={`${styles.stat__value} ${styles.expected}`}>
-                {formatNumber(shift.expected_balance)} uzs
+                {formatNumber(shift.expected_cash)} uzs
               </span>
             </div>
           </div>
