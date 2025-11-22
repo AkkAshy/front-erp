@@ -27,7 +27,7 @@ export type OpenShiftRequest = {
 };
 
 export type CloseShiftRequest = {
-  actual_cash_amount: number;
+  actual_cash: number;
   notes?: string;
 };
 

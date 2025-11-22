@@ -34,7 +34,7 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
       .mutateAsync({
         shiftId: shift.id,
         data: {
-          actual_cash_amount: balance,
+          actual_cash: balance,
           notes: notes || undefined,
         },
       })
