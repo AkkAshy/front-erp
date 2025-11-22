@@ -75,6 +75,13 @@ const Home = () => {
   const totalAmount = parseFloat(sale?.total_amount || "0") || 0;
   const totalProductCount = items.reduce((acc: number, item: { quantity: string }) => acc + (parseFloat(item.quantity) || 0), 0);
 
+  // Автоматически заполняем receivedAmount при изменении totalAmount или выборе cash
+  useEffect(() => {
+    if (selectedPaymentMethod === "cash" && totalAmount > 0) {
+      setReceivedAmount(totalAmount.toLocaleString("ru-RU"));
+    }
+  }, [totalAmount, selectedPaymentMethod]);
+
   // Debug: Log current sale data
   useEffect(() => {
     console.log('📊 Current sale data:', {
@@ -126,6 +133,16 @@ const Home = () => {
         barcode: scannedCode
       });
 
+      // Проверяем что кассир выбран
+      if (!selectedCashier?.id) {
+        console.log('❌ No cashier selected');
+        setErrorMessage("Iltimos, kassirni tanlang!");
+        setShowErrorNotification(true);
+        setScannedCode("");
+        setBarcodeInput("");
+        return;
+      }
+
       // Очищаем код СРАЗУ чтобы не было повторных вызовов
       setScannedCode("");
       setBarcodeInput("");
@@ -136,7 +153,7 @@ const Home = () => {
         product: product.id,
         quantity: 1,
         batch: null,
-        cashier: selectedCashier?.id,  // Передаем ID выбранного кассира
+        cashier: selectedCashier.id,  // Передаем ID выбранного кассира (теперь 100% не undefined)
       };
       console.log('📦 Scanning item with cashier:', scanData);
 
@@ -220,6 +237,13 @@ const Home = () => {
       return;
     }
 
+    // Проверяем что кассир выбран
+    if (!selectedCashier?.id) {
+      setErrorMessage("Iltimos, kassirni tanlang!");
+      setShowErrorNotification(true);
+      return;
+    }
+
     // Формируем payment объект
     const payment: {
       payment_method: "cash" | "card" | "transfer";
@@ -256,14 +280,21 @@ const Home = () => {
       payments: [payment],
       // Attach customer if selected
       customer_id: selectedCustomer?.id,
-      // Attach cashier if selected
-      cashier_id: selectedCashier?.id,
+      // Attach cashier - ОБЯЗАТЕЛЬНО (уже проверили выше)
+      cashier_id: selectedCashier.id,  // Не используем ?. так как проверили выше
     };
 
-    console.log('🔍 Checkout data:', checkoutData);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🛒 CHECKOUT REQUEST');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('💰 Payment method:', selectedPaymentMethod);
     console.log('💵 Total amount:', totalAmount);
     console.log('💵 Received amount:', payment.received_amount);
+    console.log('👤 Cashier ID:', selectedCashier.id);
+    console.log('👤 Cashier name:', selectedCashier.full_name);
+    console.log('📋 Sale ID:', sale.id);
+    console.log('📦 Checkout data:', JSON.stringify(checkoutData, null, 2));
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     checkout.mutate(
       {
