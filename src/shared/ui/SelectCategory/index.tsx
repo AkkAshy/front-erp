@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { type FC, useState, useMemo } from "react";
 import CategoryIcon from "../icons/ui/CategoryIcon";
 import { ArrowDownIcon } from "../icons";
 import { useCategories } from "@/entities/category/model/useCategories";
@@ -29,11 +29,21 @@ const SelectCategory: FC<Props> = ({
   bgColor,
   top,
 }) => {
-  // const [isCategoryModal, setIsCategoryModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const categoryData = useCategories();
   const selectedCategory = categoryData?.data?.data.results.find(
     (item) => item.id === categoryId
   );
+
+  // Filter categories based on search query
+  const filteredCategories = useMemo(() => {
+    if (!categoryData?.data?.data.results) return [];
+    if (!searchQuery.trim()) return categoryData.data.data.results;
+
+    return categoryData.data.data.results.filter((item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [categoryData?.data?.data.results, searchQuery]);
 
   return (
     <>
@@ -69,8 +79,21 @@ const SelectCategory: FC<Props> = ({
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {categoryData &&
-            categoryData.data?.data.results.map((item) => (
+          {isCategoryDropdown && (
+            <li className={styles.search__wrapper}>
+              <input
+                type="text"
+                className={styles.search__input}
+                placeholder="Qidirish..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                autoFocus
+              />
+            </li>
+          )}
+          {filteredCategories.length > 0 ? (
+            filteredCategories.map((item) => (
               <li
                 key={item.id}
                 className={clsx(
@@ -80,11 +103,17 @@ const SelectCategory: FC<Props> = ({
                 onClick={() => {
                   setIsCategoryDropdown(false);
                   setCategoryId((prev) => (prev === item.id ? "" : item.id));
+                  setSearchQuery("");
                 }}
               >
                 <p>{item.name}</p>
               </li>
-            ))}
+            ))
+          ) : (
+            <li className={styles.no__results}>
+              <p>Hech narsa topilmadi</p>
+            </li>
+          )}
         </ul>
       </div>
     </>

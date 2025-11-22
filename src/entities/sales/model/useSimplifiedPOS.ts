@@ -89,7 +89,9 @@ export const useCheckout = () => {
 
   return useMutation<CheckoutResponse, Error, { saleId: number; data: CheckoutRequest }>({
     mutationFn: async ({ saleId, data }) => {
+      console.log('📤 Sending checkout request:', { saleId, data });
       const response = await salesApi.checkout(saleId, data);
+      console.log('✅ Checkout response:', response.data);
       return response.data;
     },
     onSuccess: () => {

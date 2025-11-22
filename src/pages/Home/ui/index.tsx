@@ -130,13 +130,17 @@ const Home = () => {
       setBarcodeInput("");
 
       // Используем scan_item endpoint который автоматически создает/обновляет продажу
+      const scanData = {
+        session: sessionId,
+        product: product.id,
+        quantity: 1,
+        batch: null,
+        cashier: selectedCashier?.id,  // Передаем ID выбранного кассира
+      };
+      console.log('📦 Scanning item with cashier:', scanData);
+
       scanItem.mutate(
-        {
-          session: sessionId,
-          product: product.id,
-          quantity: 1,
-          batch: null,
-        },
+        scanData,
         {
           onSuccess: (data) => {
             console.log('✅ Scan item SUCCESS:', data);
@@ -215,21 +219,27 @@ const Home = () => {
       return;
     }
 
+    const checkoutData = {
+      payments: [
+        {
+          payment_method: selectedPaymentMethod,  // payment_method, не method!
+          amount: totalAmount,
+        },
+      ],
+      // Attach customer if selected
+      customer_id: selectedCustomer?.id,
+      // Attach cashier if selected
+      cashier_id: selectedCashier?.id,
+    };
+
+    console.log('🔍 Checkout data:', checkoutData);
+    console.log('💰 Payment method:', selectedPaymentMethod);
+    console.log('💵 Total amount:', totalAmount);
+
     checkout.mutate(
       {
         saleId: sale.id,
-        data: {
-          payments: [
-            {
-              payment_method: selectedPaymentMethod,  // payment_method, не method!
-              amount: totalAmount,
-            },
-          ],
-          // Attach customer if selected
-          customer_id: selectedCustomer?.id,
-          // Attach cashier if selected
-          cashier_id: selectedCashier?.id,
-        },
+        data: checkoutData,
       },
       {
         onSuccess: () => {

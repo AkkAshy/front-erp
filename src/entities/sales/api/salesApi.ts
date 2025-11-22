@@ -11,6 +11,7 @@ export const salesApi = {
     product: number;  // ID товара
     quantity?: number;
     batch?: number | null;
+    cashier?: number;  // ID кассира (ОБЯЗАТЕЛЬНО для общего аккаунта!)
   }) => api.post("/sales/sales/scan_item/", data),
 
   // Get current pending sale
@@ -39,6 +40,19 @@ export const salesApi = {
       amount: number;
       received_amount?: number;
     }>;
+    customer_id?: number;
+    new_customer?: {
+      first_name: string;
+      last_name?: string;
+      phone: string;
+      email?: string;
+      customer_type?: "individual" | "organization";
+      organization_name?: string;
+      inn?: string;
+    };
+    customer_name?: string;
+    customer_phone?: string;
+    cashier_id?: number;
   }) => api.post(`/sales/sales/${saleId}/checkout/`, data),
 
   // ===== SALES (ПРОДАЖИ) =====

@@ -12,6 +12,7 @@ export type ScanItemRequest = {
   product: number;  // ID товара (не barcode!)
   quantity?: number;  // По умолчанию 1
   batch?: number | null;
+  cashier?: number;  // ID кассира (ОБЯЗАТЕЛЬНО для общего аккаунта!)
 };
 
 // Scan item response - ИСПРАВЛЕНО согласно реальному API
