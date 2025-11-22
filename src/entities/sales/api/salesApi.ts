@@ -37,8 +37,8 @@ export const salesApi = {
   checkout: (saleId: number, data: {
     payments: Array<{
       payment_method: "cash" | "card" | "transfer";
-      amount: number;
-      received_amount?: number;
+      amount: string | number;  // API принимает и строку и число
+      received_amount?: string | number;  // API принимает и строку и число
     }>;
     customer_id?: number;
     new_customer?: {
