@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Table from "@/shared/ui/Table";
 import CreateModal from "@/shared/ui/CreateModal";
 import DashedButton from "@/shared/ui/DashedButton";
@@ -15,6 +15,9 @@ import { useFilteredCategories } from "@/entities/category/model/useFilteredCate
 import { usePagination } from "@/shared/lib/hooks/usePagination";
 import { useDeleteCategory } from "@/entities/category/model/useDeleteCategory";
 import { useAttributeTypes } from "@/entities/attribute/model/useAttributeTypes";
+import { useCategoryAttributes } from "@/entities/category/model/useCategoryAttributes";
+import { useBulkCreateCategoryAttributes } from "@/entities/category/model/useBulkCreateCategoryAttributes";
+import { useDeleteCategoryAttribute } from "@/entities/category/model/useDeleteCategoryAttribute";
 
 //scss
 import styles from "./Category.module.scss";
@@ -26,8 +29,7 @@ const Category = () => {
   const [isValidation, setIsValidation] = useState(false);
 
   const [categoryValue, setCategoryValue] = useState("");
-  // @ts-expect-error - будет использоваться позже
-  const [selectedAttributeTypes, setSelectedAttributeTypes] = useState<number[]>([]);
+  const [selectedAttributeIds, setSelectedAttributeIds] = useState<number[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
 
   const [isDeleteModal, setIsDeleteModal] = useState(false);
@@ -36,9 +38,11 @@ const Category = () => {
   const addCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
+  const bulkCreateAttributes = useBulkCreateCategoryAttributes();
+  const deleteCategoryAttribute = useDeleteCategoryAttribute();
 
-  // @ts-expect-error - будет использоваться позже
   const attributeTypes = useAttributeTypes({ limit: 100 });
+  const categoryAttributes = useCategoryAttributes(editId);
 
   const { page, setPage, offset, limit } = usePagination(1, 7);
 
@@ -46,6 +50,58 @@ const Category = () => {
     offset,
     limit,
   });
+
+  // Load existing attributes when editing category
+  useEffect(() => {
+    if (editId && categoryAttributes.data?.data) {
+      const existingAttributeIds = categoryAttributes.data.data.map(
+        (ca) => ca.attribute.id
+      );
+      setSelectedAttributeIds(existingAttributeIds);
+    }
+  }, [editId, categoryAttributes.data]);
+
+  const handleAttributeToggle = (attributeId: number) => {
+    setSelectedAttributeIds((prev) =>
+      prev.includes(attributeId)
+        ? prev.filter((id) => id !== attributeId)
+        : [...prev, attributeId]
+    );
+  };
+
+  const handleSaveAttributes = async (categoryId: number) => {
+    // Get existing attributes
+    const existingAttributes = categoryAttributes.data?.data || [];
+    const existingAttributeIds = existingAttributes.map((ca) => ca.attribute.id);
+
+    // Find attributes to add
+    const attributesToAdd = selectedAttributeIds.filter(
+      (id) => !existingAttributeIds.includes(id)
+    );
+
+    // Find attributes to remove
+    const attributesToRemove = existingAttributes.filter(
+      (ca) => !selectedAttributeIds.includes(ca.attribute.id)
+    );
+
+    // Remove unselected attributes
+    for (const attr of attributesToRemove) {
+      await deleteCategoryAttribute.mutateAsync(attr.id);
+    }
+
+    // Add new attributes
+    if (attributesToAdd.length > 0) {
+      await bulkCreateAttributes.mutateAsync({
+        category: categoryId,
+        attributes: attributesToAdd.map((attrId, index) => ({
+          attribute: attrId,
+          is_required: false,
+          is_variant: false,
+          order: index,
+        })),
+      });
+    }
+  };
 
   function handleDelete() {
     const id = typeof deleteId === 'string' ? parseInt(deleteId) : deleteId;
@@ -69,7 +125,7 @@ const Category = () => {
         onClick={() => {
           setIsOpenCategory(true);
           setCategoryValue("");
-          setSelectedAttributeTypes([]);
+          setSelectedAttributeIds([]);
         }}
       >
         + Yangi kategoriya yaratish
@@ -80,23 +136,37 @@ const Category = () => {
         onClose={() => setIsOpenCategory(false)}
         headTitle="Yangi kategoriya yaratish"
         width={552}
-        height={500}
+        height={700}
         btnTitle="Yaratish"
         btnOnClick={() => {
           addCategory
             .mutateAsync({
               name: categoryValue,
-              parent: null, // Пока создаем только корневые категории
+              parent: null,
             })
-            .then((res) => {
+            .then(async (res) => {
               if (res.status === 201) {
+                const newCategoryId = res.data.id;
+
+                // Add attributes if any selected
+                if (selectedAttributeIds.length > 0) {
+                  await bulkCreateAttributes.mutateAsync({
+                    category: newCategoryId,
+                    attributes: selectedAttributeIds.map((attrId, index) => ({
+                      attribute: attrId,
+                      is_required: false,
+                      is_variant: false,
+                      order: index,
+                    })),
+                  });
+                }
+
                 setIsOpenCategory(false);
                 setCategoryValue("");
-                setSelectedAttributeTypes([]);
+                setSelectedAttributeIds([]);
               }
             })
             .catch((err) => {
-              // Безопасная проверка наличия ошибки
               if (err?.response?.data?.name?.[0] || err?.response?.data?.slug?.[0]) {
                 setIsValidation(true);
               }
@@ -115,6 +185,22 @@ const Category = () => {
             Bunday kategoriya allaqachon mavjud
           </p>
         )}
+
+        <div className={styles.attributesSection}>
+          <label>Atributlar</label>
+          <div className={styles.attributesList}>
+            {attributeTypes.data?.data?.results?.map((attr: any) => (
+              <label key={attr.id} className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={selectedAttributeIds.includes(attr.id)}
+                  onChange={() => handleAttributeToggle(attr.id)}
+                />
+                <span>{attr.name}</span>
+              </label>
+            ))}
+          </div>
+        </div>
       </CreateModal>
 
       <Table
@@ -181,35 +267,38 @@ const Category = () => {
 
       <CreateModal
         isOpen={isOpenEdit}
-        onClose={() => setIsOpenEdit(false)}
+        onClose={() => {
+          setIsOpenEdit(false);
+          setEditId(null);
+        }}
         headTitle="Kategoriyani tahrirlash"
         btnTitle="Saqlash"
         width={552}
-        height={500}
-        btnOnClick={() => {
-          updateCategory
-            .mutateAsync({
+        height={700}
+        btnOnClick={async () => {
+          try {
+            const res = await updateCategory.mutateAsync({
               id: editId!,
               name: categoryValue,
-            })
-            .then((res) => {
-              console.log(res);
-
-              if (res.status === 200) {
-                setIsOpenEdit(false);
-                setCategoryValue("");
-                setSelectedAttributeTypes([]);
-                setIsValidation(false);
-              }
-            })
-            .catch((err) => {
-              // Безопасная проверка наличия ошибки
-              if (err?.response?.data?.non_field_errors?.[0] ||
-                  err?.response?.data?.name?.[0] ||
-                  err?.response?.data?.slug?.[0]) {
-                setIsValidation(true);
-              }
             });
+
+            if (res.status === 200) {
+              // Save attributes
+              await handleSaveAttributes(editId!);
+
+              setIsOpenEdit(false);
+              setCategoryValue("");
+              setSelectedAttributeIds([]);
+              setIsValidation(false);
+              setEditId(null);
+            }
+          } catch (err: any) {
+            if (err?.response?.data?.non_field_errors?.[0] ||
+                err?.response?.data?.name?.[0] ||
+                err?.response?.data?.slug?.[0]) {
+              setIsValidation(true);
+            }
+          }
         }}
         onClick={() => {
           setIsValidation(false);
@@ -227,6 +316,26 @@ const Category = () => {
             Bunday kategoriya allaqachon mavjud
           </p>
         )}
+
+        <div className={styles.attributesSection}>
+          <label>Atributlar</label>
+          <div className={styles.attributesList}>
+            {categoryAttributes.isLoading ? (
+              <div>Yuklanmoqda...</div>
+            ) : (
+              attributeTypes.data?.data?.results?.map((attr: any) => (
+                <label key={attr.id} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selectedAttributeIds.includes(attr.id)}
+                    onChange={() => handleAttributeToggle(attr.id)}
+                  />
+                  <span>{attr.name}</span>
+                </label>
+              ))
+            )}
+          </div>
+        </div>
       </CreateModal>
 
       <TablePagination
@@ -268,15 +377,29 @@ const Category = () => {
       <Notification
         type="success"
         message="Muvaffaqiyat"
-        description="Kategoriya o‘chirildi."
+        description="Kategoriya o'chirildi."
         onOpen={deleteCategory.isSuccess}
       />
 
       <Notification
         type="error"
         message="Xatolik"
-        description="Kategoriya o‘chirishda xatolik."
+        description="Kategoriya o'chirishda xatolik."
         onOpen={deleteCategory.isError}
+      />
+
+      <Notification
+        type="success"
+        message="Muvaffaqiyat"
+        description="Atributlar saqlandi."
+        onOpen={bulkCreateAttributes.isSuccess}
+      />
+
+      <Notification
+        type="error"
+        message="Xatolik"
+        description="Atributlarni saqlashda xatolik."
+        onOpen={bulkCreateAttributes.isError}
       />
 
       {isDeleteModal && (

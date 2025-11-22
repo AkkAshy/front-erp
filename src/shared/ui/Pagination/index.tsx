@@ -18,14 +18,13 @@ const TablePagination: FC<Props> = ({
 }) => {
   const style: React.CSSProperties = {
     height: "44px",
-    position: "fixed",
-    left: "252px",
-    right: 0,
-    bottom,
+    width: "100%",
+    marginTop: "auto",
+    paddingTop: "20px",
+    paddingBottom: "20px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 10,
     backgroundColor: "#fff",
   };
   return (
