@@ -5,7 +5,6 @@ type Props = {
   current: number;
   total: number;
   pageSize: number;
-  bottom?: number;
   onChange: (page: number) => void;
 };
 
@@ -14,7 +13,6 @@ const TablePagination: FC<Props> = ({
   total,
   pageSize,
   onChange,
-  bottom = 0,
 }) => {
   const style: React.CSSProperties = {
     height: "44px",
