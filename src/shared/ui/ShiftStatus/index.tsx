@@ -64,7 +64,7 @@ const ShiftStatus: FC = () => {
             <div className={styles.statItem}>
               <span className={styles.statLabel}>Boshlang'ich:</span>
               <span className={styles.statValue}>
-                {Number(shift.opening_balance).toLocaleString("de-DE")} uzs
+                {(Number(shift.opening_balance) || 0).toLocaleString("de-DE")} uzs
               </span>
             </div>
 
@@ -78,7 +78,7 @@ const ShiftStatus: FC = () => {
             <div className={styles.statItem}>
               <span className={styles.statLabel}>Jami:</span>
               <span className={`${styles.statValue} ${styles.total}`}>
-                {Number(shift.total_sales).toLocaleString("de-DE")} uzs
+                {(Number(shift.total_sales) || 0).toLocaleString("de-DE")} uzs
               </span>
             </div>
           </div>

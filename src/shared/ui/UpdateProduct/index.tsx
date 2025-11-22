@@ -76,10 +76,10 @@ const UpdateProduct: FC<Props> = ({
 
       setPurchasePrice(
         product.batches?.[0]?.purchase_price
-          ? (+product.batches[0].purchase_price).toLocaleString("de-DE")
+          ? ((+product.batches[0].purchase_price) || 0).toLocaleString("de-DE")
           : "0"
       );
-      setSalePrice((+product.sale_price).toLocaleString("de-DE"));
+      setSalePrice(((+product.sale_price) || 0).toLocaleString("de-DE"));
     }
   }, [productsData.data?.data.results, updateId]);
 

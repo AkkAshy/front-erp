@@ -82,42 +82,42 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Boshlang'ich balans:</span>
               <span className={styles.stat__value}>
-                {Number(shift.opening_balance).toLocaleString("de-DE")} uzs
+                {(Number(shift.opening_balance) || 0).toLocaleString("de-DE")} uzs
               </span>
             </div>
 
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Jami sotuvlar:</span>
               <span className={styles.stat__value}>
-                {Number(shift.total_sales).toLocaleString("de-DE")} uzs
+                {(Number(shift.total_sales) || 0).toLocaleString("de-DE")} uzs
               </span>
             </div>
 
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Naqd pul:</span>
               <span className={styles.stat__value}>
-                {Number(shift.total_cash_sales).toLocaleString("de-DE")} uzs
+                {(Number(shift.total_cash_sales) || 0).toLocaleString("de-DE")} uzs
               </span>
             </div>
 
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Karta:</span>
               <span className={styles.stat__value}>
-                {Number(shift.total_card_sales).toLocaleString("de-DE")} uzs
+                {(Number(shift.total_card_sales) || 0).toLocaleString("de-DE")} uzs
               </span>
             </div>
 
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>O'tkazma:</span>
               <span className={styles.stat__value}>
-                {Number(shift.total_transfer_sales).toLocaleString("de-DE")} uzs
+                {(Number(shift.total_transfer_sales) || 0).toLocaleString("de-DE")} uzs
               </span>
             </div>
 
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Kutilayotgan balans:</span>
               <span className={`${styles.stat__value} ${styles.expected}`}>
-                {Number(shift.expected_balance).toLocaleString("de-DE")} uzs
+                {(Number(shift.expected_balance) || 0).toLocaleString("de-DE")} uzs
               </span>
             </div>
           </div>

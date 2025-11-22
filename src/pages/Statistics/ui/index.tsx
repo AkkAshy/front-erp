@@ -321,10 +321,10 @@ const Statistics = () => {
                   </div>
                   <div className={styles.count_wrapper}>
                     <span className={styles.count}>
-                      {item.total_quantity?.toLocaleString?.("de-DE")} marta
+                      {(item.total_quantity ?? 0).toLocaleString("de-DE")} marta
                     </span>
                     <span className={styles.percent}>
-                      {percentOfTotal(item.total_quantity, topProductsTotal)}
+                      {percentOfTotal(item.total_quantity ?? 0, topProductsTotal)}
                     </span>
                   </div>
                 </li>
@@ -362,7 +362,7 @@ const Statistics = () => {
                     <p className={styles.name}>{item.customer__full_name}</p>
                   </div>
                   <span className={styles.item__price}>
-                    {item.total_purchases?.toLocaleString?.("de-DE")} uzs
+                    {(item.total_purchases ?? 0).toLocaleString("de-DE")} uzs
                   </span>
                 </li>
               ))}
@@ -399,7 +399,7 @@ const Statistics = () => {
                     <p className={styles.name}>{cashier.full_name}</p>
                   </div>
                   <span className={styles.item__price}>
-                    {parseFloat(cashier.total_sales).toLocaleString("de-DE")} uzs
+                    {(parseFloat(cashier.total_sales) || 0).toLocaleString("de-DE")} uzs
                   </span>
                 </li>
               ))}
@@ -422,7 +422,7 @@ const Statistics = () => {
                   <p className={styles.title}>{item.method}</p>
                 </div>
                 <span className={styles.price}>
-                  {item.price.toLocaleString("de-DE")} uzs
+                  {(item.price ?? 0).toLocaleString("de-DE")} uzs
                 </span>
               </li>
             ))}

@@ -186,12 +186,12 @@ const Inventory = () => {
             unit: item.unit_name || item.unit_short || item.unit_info?.short_name || "-",
             current_stock:
               Number(quantity) <= 1 ? (
-                <p style={{ color: "red" }}>{parseFloat(String(quantity)).toFixed(0)}</p>
+                <p style={{ color: "red" }}>{(parseFloat(String(quantity)) || 0).toFixed(0)}</p>
               ) : (
-                parseFloat(String(quantity)).toFixed(0)
+                (parseFloat(String(quantity)) || 0).toFixed(0)
               ),
-            sale_price: (+item.sale_price).toLocaleString("de-DE") + " uzs",
-            margin: margin ? `${(+margin).toFixed(1)}%` : "-",
+            sale_price: ((+item.sale_price) || 0).toLocaleString("de-DE") + " uzs",
+            margin: margin ? `${((+margin) || 0).toFixed(1)}%` : "-",
             content_1: (
               <div
                 onClick={() => {

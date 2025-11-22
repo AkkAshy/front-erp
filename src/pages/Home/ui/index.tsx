@@ -71,8 +71,8 @@ const Home = () => {
   // ИСПРАВЛЕНО: CurrentSaleResponse.data содержит Sale напрямую (не обернутый в { sale: ... })
   const sale = currentSale.data?.data;  // data содержит Sale | null
   const items = sale?.items || [];
-  const totalAmount = parseFloat(sale?.total_amount || "0");
-  const totalProductCount = items.reduce((acc: number, item: { quantity: string }) => acc + parseFloat(item.quantity), 0);
+  const totalAmount = parseFloat(sale?.total_amount || "0") || 0;
+  const totalProductCount = items.reduce((acc: number, item: { quantity: string }) => acc + (parseFloat(item.quantity) || 0), 0);
 
   // Debug: Log current sale data
   useEffect(() => {
@@ -299,8 +299,8 @@ const Home = () => {
             name: item.product_name,
             sku: "-", // SKU not included in sale item
             unit: "-", // Unit not included in sale item
-            quantity: `${parseFloat(item.quantity).toFixed(0)}x`,
-            sale_price: (+item.unit_price).toLocaleString("de-DE") + " uzs",
+            quantity: `${(parseFloat(item.quantity) || 0).toFixed(0)}x`,
+            sale_price: ((+item.unit_price) || 0).toLocaleString("de-DE") + " uzs",
             content_2: (
               <div onClick={() => handleDeleteProduct(item.id)}>
                 <DeleteIcon />

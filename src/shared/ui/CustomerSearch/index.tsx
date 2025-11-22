@@ -205,7 +205,7 @@ export const CustomerSearch = ({
               <div className={styles.stat}>
                 <span className={styles.label}>Jami xarid:</span>
                 <span className={styles.value}>
-                  {selectedCustomer.total_spent?.toLocaleString() || 0} so'm
+                  {(selectedCustomer.total_spent ?? 0).toLocaleString()} so'm
                 </span>
               </div>
               <div className={styles.stat}>
@@ -218,7 +218,7 @@ export const CustomerSearch = ({
                 <div className={styles.stat}>
                   <span className={styles.label}>Bonus:</span>
                   <span className={styles.value}>
-                    {selectedCustomer.bonus_balance.toLocaleString()}
+                    {(selectedCustomer.bonus_balance ?? 0).toLocaleString()}
                   </span>
                 </div>
               )}
@@ -250,7 +250,7 @@ export const CustomerSearch = ({
                     <span className={styles.phoneSmall}>{customer.phone}</span>
                     {customer.total_spent && (
                       <span className={styles.totalSpent}>
-                        {customer.total_spent.toLocaleString()} so'm xarid qilgan
+                        {(customer.total_spent ?? 0).toLocaleString()} so'm xarid qilgan
                       </span>
                     )}
                   </div>

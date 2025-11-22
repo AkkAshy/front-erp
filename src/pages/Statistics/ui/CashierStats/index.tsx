@@ -38,9 +38,9 @@ const CashierStats = () => {
       index: index + 1,
       full_name: cashier.full_name,
       phone: cashier.phone,
-      total_sales: `${parseFloat(cashier.total_sales).toLocaleString("de-DE")} uzs`,
-      cash_sales: `${parseFloat(cashier.cash_sales).toLocaleString("de-DE")} uzs`,
-      card_sales: `${parseFloat(cashier.card_sales).toLocaleString("de-DE")} uzs`,
+      total_sales: `${(parseFloat(cashier.total_sales) || 0).toLocaleString("de-DE")} uzs`,
+      cash_sales: `${(parseFloat(cashier.cash_sales) || 0).toLocaleString("de-DE")} uzs`,
+      card_sales: `${(parseFloat(cashier.card_sales) || 0).toLocaleString("de-DE")} uzs`,
       sales_count: cashier.sales_count,
       sessions_count: cashier.sessions_count,
     }));
@@ -49,7 +49,7 @@ const CashierStats = () => {
   const totalSum = useMemo(() => {
     if (!data?.data?.cashiers) return 0;
     return data.data.cashiers.reduce(
-      (acc, cashier) => acc + parseFloat(cashier.total_sales),
+      (acc, cashier) => acc + (parseFloat(cashier.total_sales) || 0),
       0
     );
   }, [data]);

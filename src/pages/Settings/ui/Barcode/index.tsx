@@ -92,7 +92,7 @@ const Barcode = () => {
 
       <g transform="translate(0, 60)">
         <text x="290" y="80" font-size="48" font-weight="bold" text-anchor="middle">
-          ${(+item.sale_price).toLocaleString("de-DE")} uzs
+          ${((+item.sale_price) || 0).toLocaleString("de-DE")} uzs
         </text>
 
         <text x="290" y="120" font-size="28" text-anchor="middle">
@@ -233,7 +233,7 @@ const Barcode = () => {
               <div className={styles.item__header}>
                 <span className={styles.size}>{item.size?.size ?? "-"}</span>
                 <span className={styles.price}>
-                  {(+item.sale_price).toLocaleString("de-DE")} uzs
+                  {((+item.sale_price) || 0).toLocaleString("de-DE")} uzs
                 </span>
                 <p className={styles.title}>{item.name}</p>
                 {item.barcode && String(item.barcode).trim() !== "" ? (

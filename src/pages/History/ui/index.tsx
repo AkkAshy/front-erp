@@ -105,7 +105,7 @@ const History = () => {
                   </span>
                 ),
               cashier: item.cashier_name || "Не указан",
-              items_count: item.total_quantity ? parseFloat(item.total_quantity).toFixed(0) : 0,
+              items_count: item.total_quantity ? (parseFloat(item.total_quantity) || 0).toFixed(0) : 0,
               payment_method: "Не указан", // TODO: Нужно добавить информацию о платеже из другого источника
               total_amount:
                 (Number(item.total_amount) || 0).toLocaleString(
