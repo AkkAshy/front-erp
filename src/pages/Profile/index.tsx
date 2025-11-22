@@ -103,6 +103,11 @@ const Profile = () => {
             <span className={styles.profile__phone}>
               {formatUzPhone(profile.data?.data?.employee?.phone)}
             </span>
+            {profile.data?.data?.email && (
+              <span className={styles.profile__email}>
+                {profile.data?.data?.email}
+              </span>
+            )}
             {profile.data?.data?.employee?.role_display && (
               <span className={styles.profile__role}>
                 {profile.data?.data?.employee?.role_display}
