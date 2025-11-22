@@ -4,6 +4,7 @@ import PageTitle from "@/shared/ui/PageTitle";
 import Table from "@/shared/ui/Table";
 import PeriodSelector from "@/shared/ui/PeriodSelector";
 import { getToday, getFirstDayOfMonth } from "@/shared/lib/date/date";
+import { formatNumber } from "@/shared/lib/utils/formatters";
 import styles from "./CashierStats.module.scss";
 
 const CashierStats = () => {
@@ -38,9 +39,9 @@ const CashierStats = () => {
       index: index + 1,
       full_name: cashier.full_name,
       phone: cashier.phone,
-      total_sales: `${(parseFloat(cashier.total_sales) || 0).toLocaleString("de-DE")} uzs`,
-      cash_sales: `${(parseFloat(cashier.cash_sales) || 0).toLocaleString("de-DE")} uzs`,
-      card_sales: `${(parseFloat(cashier.card_sales) || 0).toLocaleString("de-DE")} uzs`,
+      total_sales: `${formatNumber(parseFloat(cashier.total_sales) || 0)} uzs`,
+      cash_sales: `${formatNumber(parseFloat(cashier.cash_sales) || 0)} uzs`,
+      card_sales: `${formatNumber(parseFloat(cashier.card_sales) || 0)} uzs`,
       sales_count: cashier.sales_count,
       sessions_count: cashier.sessions_count,
     }));
@@ -147,7 +148,7 @@ const CashierStats = () => {
             <div className={styles.summaryItem}>
               <span className={styles.label}>Umumiy summa:</span>
               <span className={styles.value}>
-                {totalSum.toLocaleString("de-DE")} uzs
+                {formatNumber(totalSum)} uzs
               </span>
             </div>
           </div>

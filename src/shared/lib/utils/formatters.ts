@@ -32,3 +32,19 @@ export function formatUzPhone(phone?: string | number): string {
     "+$1 $2 $3 $4 $5"
   );
 }
+
+/**
+ * Форматирует число с пробелами в качестве разделителя тысяч
+ * @param value - число для форматирования
+ * @returns отформатированную строку (например: "1 000", "10 000", "100")
+ */
+export function formatNumber(value: number | string | null | undefined): string {
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+
+  if (num === null || num === undefined || isNaN(num)) {
+    return '0';
+  }
+
+  // Используем русскую локаль (ru-RU) которая использует пробел как разделитель тысяч
+  return num.toLocaleString('ru-RU');
+}

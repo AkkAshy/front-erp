@@ -2,6 +2,7 @@ import { useState, type FC } from "react";
 import CreateModal from "../CreateModal";
 import Notification from "../Notification";
 import { useCloseShift } from "@/entities/sales/model/useCloseShift";
+import { formatNumber } from "@/shared/lib/utils/formatters";
 import type { CashierShift } from "@/entities/sales/api/shiftTypes";
 import styles from "./CloseShiftModal.module.scss";
 
@@ -21,7 +22,8 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
   const handleClose = () => {
     if (!shift) return;
 
-    const balance = parseFloat(closingBalance.replace(/\./g, "").replace(/,/g, "."));
+    // Убираем все пробелы и неразрывные пробелы, затем парсим
+    const balance = parseFloat(closingBalance.replace(/\s/g, "").replace(/\u00A0/g, ""));
 
     if (!closingBalance || isNaN(balance) || balance < 0) {
       setError("Kiriting to'g'ri yakuniy balansni");
@@ -32,7 +34,7 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
       .mutateAsync({
         shiftId: shift.id,
         data: {
-          closing_balance: balance,
+          actual_cash_amount: balance,
           notes: notes || undefined,
         },
       })
@@ -58,9 +60,9 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
 
   if (!shift) return null;
 
-  const expectedBalance = parseFloat(shift.expected_balance);
+  const expectedBalance = parseFloat(shift.expected_balance) || 0;
   const difference = closingBalance
-    ? parseFloat(closingBalance.replace(/\./g, "").replace(/,/g, ".")) - expectedBalance
+    ? (parseFloat(closingBalance.replace(/\s/g, "").replace(/\u00A0/g, "")) || 0) - expectedBalance
     : 0;
 
   return (
@@ -129,7 +131,7 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
               onChange={(e) => {
                 const numericValue = e.target.value.replace(/\D/g, "");
                 const formattedValue = numericValue
-                  ? Number(numericValue).toLocaleString("de-DE")
+                  ? Number(numericValue).toLocaleString("ru-RU")
                   : "";
                 setClosingBalance(formattedValue);
               }}

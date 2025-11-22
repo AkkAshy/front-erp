@@ -21,7 +21,16 @@ export function percentOfTotal(
   value: number | undefined,
   total: number | undefined
 ): string {
-  if (!value || !total || total === 0) return "0%";
-  const percent = (value / total) * 100;
+  // Проверяем на null/undefined и NaN
+  const numValue = typeof value === 'number' ? value : 0;
+  const numTotal = typeof total === 'number' ? total : 0;
+
+  if (!Number.isFinite(numValue) || !Number.isFinite(numTotal) || numTotal === 0) {
+    return "0%";
+  }
+
+  if (numValue === 0) return "0%";
+
+  const percent = (numValue / numTotal) * 100;
   return `${percent.toFixed(1)}%`; // например "12.3%"
 }

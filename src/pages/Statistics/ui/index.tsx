@@ -17,6 +17,7 @@ import { getToday, getYesterday } from "@/shared/lib/date/date";
 import { mapPaymentSummary } from "@/shared/lib/utils/mapPaymentSummary";
 import { buildSummaryItems } from "@/shared/lib/utils/buildSummaryItems";
 import { percentOfTotal } from "@/shared/lib/math/percent";
+import { formatNumber } from "@/shared/lib/utils/formatters";
 import HorizontalDnd from "@/shared/ui/DnD/HorizontalDnd";
 
 import clsx from "clsx";
@@ -73,7 +74,7 @@ const Statistics = () => {
   const topProductsTotal = useMemo(
     () =>
       topProducts.data?.top_products.reduce(
-        (acc, curr) => acc + curr.total_quantity,
+        (acc, curr) => acc + (Number(curr.total_quantity) || 0),
         0
       ) ?? 0,
     [topProducts.data]
@@ -321,7 +322,7 @@ const Statistics = () => {
                   </div>
                   <div className={styles.count_wrapper}>
                     <span className={styles.count}>
-                      {(item.total_quantity ?? 0).toLocaleString("de-DE")} marta
+                      {formatNumber(item.total_quantity ?? 0)} marta
                     </span>
                     <span className={styles.percent}>
                       {percentOfTotal(item.total_quantity ?? 0, topProductsTotal)}
@@ -362,7 +363,7 @@ const Statistics = () => {
                     <p className={styles.name}>{item.customer__full_name}</p>
                   </div>
                   <span className={styles.item__price}>
-                    {(item.total_purchases ?? 0).toLocaleString("de-DE")} uzs
+                    {formatNumber(item.total_purchases ?? 0)} uzs
                   </span>
                 </li>
               ))}
@@ -399,7 +400,7 @@ const Statistics = () => {
                     <p className={styles.name}>{cashier.full_name}</p>
                   </div>
                   <span className={styles.item__price}>
-                    {(parseFloat(cashier.total_sales) || 0).toLocaleString("de-DE")} uzs
+                    {formatNumber(parseFloat(cashier.total_sales) || 0)} uzs
                   </span>
                 </li>
               ))}
@@ -422,7 +423,7 @@ const Statistics = () => {
                   <p className={styles.title}>{item.method}</p>
                 </div>
                 <span className={styles.price}>
-                  {(item.price ?? 0).toLocaleString("de-DE")} uzs
+                  {formatNumber(item.price ?? 0)} uzs
                 </span>
               </li>
             ))}
