@@ -35,6 +35,7 @@ const Home = () => {
   const [barcodeInput, setBarcodeInput] = useState<string>("");  // Для input поля
   const [scannedCode, setScannedCode] = useState<string>("");     // Для API запроса
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"cash" | "card" | "transfer">("cash");
+  const [receivedAmount, setReceivedAmount] = useState<string>("");  // Полученная сумма от клиента
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -219,13 +220,40 @@ const Home = () => {
       return;
     }
 
+    // Формируем payment объект
+    const payment: {
+      payment_method: "cash" | "card" | "transfer";
+      amount: number;
+      received_amount?: number;
+    } = {
+      payment_method: selectedPaymentMethod,
+      amount: totalAmount,
+    };
+
+    // Для наличных добавляем received_amount
+    if (selectedPaymentMethod === "cash") {
+      let received: number;
+
+      if (receivedAmount) {
+        // Если пользователь ввёл сумму, используем её
+        received = parseFloat(receivedAmount.replace(/\s/g, "").replace(/\u00A0/g, "")) || 0;
+
+        // Проверяем, что полученная сумма >= суммы к оплате
+        if (received < totalAmount) {
+          setErrorMessage(`Qabul qilingan summa (${received.toLocaleString("ru-RU")} uzs) to'lov summasidan kam (${totalAmount.toLocaleString("ru-RU")} uzs)`);
+          setShowErrorNotification(true);
+          return;
+        }
+      } else {
+        // Если не ввёл - используем точную сумму (без сдачи)
+        received = totalAmount;
+      }
+
+      payment.received_amount = received;
+    }
+
     const checkoutData = {
-      payments: [
-        {
-          payment_method: selectedPaymentMethod,  // payment_method, не method!
-          amount: totalAmount,
-        },
-      ],
+      payments: [payment],
       // Attach customer if selected
       customer_id: selectedCustomer?.id,
       // Attach cashier if selected
@@ -235,6 +263,7 @@ const Home = () => {
     console.log('🔍 Checkout data:', checkoutData);
     console.log('💰 Payment method:', selectedPaymentMethod);
     console.log('💵 Total amount:', totalAmount);
+    console.log('💵 Received amount:', payment.received_amount);
 
     checkout.mutate(
       {
@@ -244,8 +273,9 @@ const Home = () => {
       {
         onSuccess: () => {
           setShowSuccessNotification(true);
-          // Clear customer selection after successful checkout
+          // Clear customer selection and received amount after successful checkout
           setSelectedCustomer(null);
+          setReceivedAmount("");
         },
         onError: (error: any) => {
           setErrorMessage(error?.response?.data?.message || "Xatolik yuz berdi");
@@ -395,6 +425,64 @@ const Home = () => {
               <p>Umumiy summa:</p>
               <span>{totalAmount.toLocaleString("de-DE")} uzs</span>
             </div>
+
+            {/* Received amount input for cash payments */}
+            {selectedPaymentMethod === "cash" && (
+              <div style={{ marginTop: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <p style={{ fontSize: '14px', color: '#64748b', fontWeight: '500' }}>
+                    Qabul qilingan summa:
+                  </p>
+                  <button
+                    onClick={() => setReceivedAmount(totalAmount.toLocaleString("ru-RU"))}
+                    style={{
+                      padding: '4px 8px',
+                      fontSize: '12px',
+                      color: '#3b82f6',
+                      backgroundColor: 'transparent',
+                      border: '1px solid #3b82f6',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                    }}
+                  >
+                    Aniq summa
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={receivedAmount}
+                  onChange={(e) => {
+                    const numericValue = e.target.value.replace(/\D/g, "");
+                    const formattedValue = numericValue
+                      ? Number(numericValue).toLocaleString("ru-RU")
+                      : "";
+                    setReceivedAmount(formattedValue);
+                  }}
+                  placeholder="0 uzs"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    color: '#0f1c3d',
+                    backgroundColor: '#fff',
+                    outline: 'none',
+                  }}
+                  autoFocus
+                />
+                {/* Show change amount */}
+                {receivedAmount && totalAmount > 0 && (
+                  <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '14px', color: '#64748b' }}>Qaytim:</span>
+                    <span style={{ fontSize: '16px', fontWeight: '600', color: '#10b981' }}>
+                      {Math.max(0, parseFloat(receivedAmount.replace(/\s/g, "").replace(/\u00A0/g, "")) - totalAmount).toLocaleString("ru-RU")} uzs
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className={styles.ticket}>
@@ -422,13 +510,19 @@ const Home = () => {
             </li>
             <li
               className={clsx(styles.item, selectedPaymentMethod === "card" && styles.checked)}
-              onClick={() => setSelectedPaymentMethod("card")}
+              onClick={() => {
+                setSelectedPaymentMethod("card");
+                setReceivedAmount("");  // Очищаем полученную сумму
+              }}
             >
               <p>Karta</p>
             </li>
             <li
               className={clsx(styles.item, selectedPaymentMethod === "transfer" && styles.checked)}
-              onClick={() => setSelectedPaymentMethod("transfer")}
+              onClick={() => {
+                setSelectedPaymentMethod("transfer");
+                setReceivedAmount("");  // Очищаем полученную сумму
+              }}
             >
               <p>O'tkazma</p>
             </li>
