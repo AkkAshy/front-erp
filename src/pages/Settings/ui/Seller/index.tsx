@@ -150,7 +150,10 @@ const Seller = () => {
     }
 
     // Валидация для создания с User аккаунтом
-    if (createWithAccount) {
+    // Для ролей кроме cashier - поля обязательны
+    const requiresAccount = createWithAccount || (role && role !== "cashier");
+
+    if (requiresAccount) {
       if (!isEmail(email)) {
         setError("Emailni to'g'ri kiriting");
         return;
@@ -185,7 +188,10 @@ const Seller = () => {
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(" ") || "";
 
-    if (createWithAccount) {
+    // Для всех ролей кроме cashier создаём User с аккаунтом
+    const shouldCreateUser = requiresAccount;
+
+    if (shouldCreateUser) {
       // Создаём User с аккаунтом
       createUser
         .mutateAsync({
@@ -204,7 +210,7 @@ const Seller = () => {
           }
         });
     } else {
-      // Создаём простого Employee без аккаунта
+      // Создаём простого Employee без аккаунта (только для cashier без чекбокса)
       createEmployee
         .mutateAsync({
           first_name: firstName,
@@ -612,7 +618,7 @@ const Seller = () => {
           }
         }}
       >
-        {!isOpenUpdate && (
+        {!isOpenUpdate && role === "cashier" && (
           <div className={styles.checkbox} style={{ marginBottom: '16px' }}>
             <ConfigProvider
               theme={{
@@ -628,6 +634,14 @@ const Seller = () => {
             </ConfigProvider>
             <span className={styles.text} style={{ fontSize: '16px' }}>
               Login va parol bilan akkaunt yaratish
+            </span>
+          </div>
+        )}
+
+        {!isOpenUpdate && role && role !== "cashier" && (
+          <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+            <span style={{ fontSize: '14px', color: '#0369a1' }}>
+              ℹ️ Bu rol uchun login va parol majburiy
             </span>
           </div>
         )}
@@ -652,7 +666,7 @@ const Seller = () => {
               placeholder="+998 (__) ___-__-__"
             />
           </div>
-          {createWithAccount && !isOpenUpdate && (
+          {((createWithAccount && role === "cashier") || (role && role !== "cashier")) && !isOpenUpdate && (
             <div className={styles.input__wrapper}>
               <p className={styles.label__input}>Email</p>
               <input
@@ -676,7 +690,7 @@ const Seller = () => {
           )}
         </div>
 
-        {(createWithAccount || isOpenUpdate) && (
+        {(((createWithAccount && role === "cashier") || (role && role !== "cashier")) || isOpenUpdate) && (
           <div className={styles.form__wrapper}>
             <div className={styles.input__wrapper}>
               <p className={styles.label__input}>Login</p>
