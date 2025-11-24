@@ -30,10 +30,10 @@ const Barcode = () => {
   const [storeName, setStoreName] = useState<string>("Magazin");
 
   useEffect(() => {
-    // Безопасная проверка с optional chaining
-    const stores = profileInfo.data?.data?.employee?.accessible_stores_info;
-    if (stores && stores.length > 0 && stores[0].name) {
-      setStoreName(stores[0].name);
+    // Используем название магазина из профиля (AxiosResponse -> ProfileResponse -> data -> store -> name)
+    const store = profileInfo.data?.data?.data?.store;
+    if (store?.name) {
+      setStoreName(store.name);
     }
   }, [profileInfo.data]);
 

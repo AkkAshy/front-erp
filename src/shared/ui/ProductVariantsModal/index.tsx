@@ -121,8 +121,8 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
     }
 
     try {
-      // Получаем название магазина из профиля пользователя
-      const storeName = profile.data?.data?.store?.name || "Magazin";
+      // Получаем название магазина из профиля пользователя (AxiosResponse -> ProfileResponse -> data -> store -> name)
+      const storeName = profile.data?.data?.data?.store?.name || "Magazin";
       const svgString = createSVGLabel(variant, storeName);
       const svgBase64 = svgToBase64(svgString);
       const imageData = `data:image/svg+xml;base64,${svgBase64}`;

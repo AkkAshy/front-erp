@@ -22,6 +22,34 @@
     height: 64px;
     margin-top: 24px;
   }
+
+  .clearFiltersBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    height: 48px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
   
   .empty {
     margin-top: 200px;
@@ -92,14 +120,24 @@
     font-size: 22px;
     color: #0f1c3d;
   }
+  .sku__column {
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #8E51FF;
+  }
   .product__count {
     text-align: center;
     color: #64748b;
   }
   .product__price {
     text-align: center;
-
     color: #0f1c3d;
+  }
+  .margin__column {
+    text-align: center;
+    color: #10b981;
+    font-weight: 500;
   }
   .thead__more,
   .edit__btn,

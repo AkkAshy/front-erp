@@ -35,11 +35,11 @@ const Profile = () => {
   const inputRef = useMask(maskOptions);
 
   useEffect(() => {
-    if (profile.data?.data) {
-      // useProfileInfo возвращает { data: UserInfo }, поэтому доступ через profile.data.data
-      const userData = profile.data.data;
-      setName(userData.first_name || "");
-      setSurname(userData.last_name || "");
+    if (profile.data?.data?.data) {
+      // AxiosResponse -> ProfileResponse -> data -> user/store/employee
+      const userData = profile.data.data.data;
+      setName(userData.user?.first_name || "");
+      setSurname(userData.user?.last_name || "");
 
       const phoneNumber = userData.employee?.phone;
       if (phoneNumber) {
@@ -48,8 +48,8 @@ const Profile = () => {
         setPhone("");
       }
 
-      // Устанавливаем gender из employee.sex если есть
-      setGender(userData.employee?.sex || "");
+      // Устанавливаем gender из employee.sex если есть (если поле существует)
+      setGender("");  // ProfileResponse.employee не имеет поля sex
     }
   }, [profile.data]);
 
@@ -97,20 +97,20 @@ const Profile = () => {
 
           <div className={styles.profile__info}>
             <p className={styles.profile__name}>
-              {profile.data?.data?.full_name ||
-               `${profile.data?.data?.first_name || ''} ${profile.data?.data?.last_name || ''}`}
+              {profile.data?.data?.data?.user?.full_name ||
+               `${profile.data?.data?.data?.user?.first_name || ''} ${profile.data?.data?.data?.user?.last_name || ''}`}
             </p>
             <span className={styles.profile__phone}>
-              {formatUzPhone(profile.data?.data?.employee?.phone)}
+              {formatUzPhone(profile.data?.data?.data?.employee?.phone)}
             </span>
-            {profile.data?.data?.email && (
+            {profile.data?.data?.data?.user?.email && (
               <span className={styles.profile__email}>
-                {profile.data?.data?.email}
+                {profile.data?.data?.data?.user?.email}
               </span>
             )}
-            {profile.data?.data?.employee?.role_display && (
+            {profile.data?.data?.data?.employee?.role_display && (
               <span className={styles.profile__role}>
-                {profile.data?.data?.employee?.role_display}
+                {profile.data?.data?.data?.employee?.role_display}
               </span>
             )}
           </div>

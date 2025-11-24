@@ -139,6 +139,18 @@ const Inventory = () => {
           userId={userId}
           setUserId={setUserId}
         />
+        {(search || categoryId || userId) && (
+          <button
+            className={styles.clearFiltersBtn}
+            onClick={() => {
+              setSearch("");
+              setCategoryId("");
+              setUserId("");
+            }}
+          >
+            ✕ Tozalash
+          </button>
+        )}
       </div>
 
       <CreateProduct
