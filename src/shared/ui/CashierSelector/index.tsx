@@ -12,33 +12,13 @@ const CashierSelector: FC<Props> = ({ onSelect, selectedCashierId }) => {
   const { data: cashiersData, isLoading, isError } = useCashiers();
   const [selectedCashier, setSelectedCashier] = useState<Cashier | null>(null);
 
-  // Restore selected cashier from localStorage on mount - ТОЛЬКО если не передан selectedCashierId
+  // Синхронизация с родительским компонентом через selectedCashierId
   useEffect(() => {
-    if (selectedCashierId !== undefined) {
-      // Если prop передан явно (даже null), не восстанавливаем из localStorage
-      return;
-    }
-
-    const savedCashierId = localStorage.getItem("selectedCashierId");
-    if (savedCashierId && cashiersData?.data) {
-      const cashier = cashiersData.data.find(
-        (c) => c.id === parseInt(savedCashierId)
-      );
-      if (cashier) {
-        setSelectedCashier(cashier);
-        onSelect(cashier); // Уведомляем родителя
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cashiersData, selectedCashierId]);
-
-  // Update from props
-  useEffect(() => {
-    if (selectedCashierId === null || selectedCashierId === undefined) {
+    if (selectedCashierId === null) {
       // Если selectedCashierId явно null, сбрасываем выбор
       setSelectedCashier(null);
-      localStorage.removeItem("selectedCashierId");
     } else if (selectedCashierId && cashiersData?.data) {
+      // Если передан конкретный ID, находим и устанавливаем кассира
       const cashier = cashiersData.data.find((c) => c.id === selectedCashierId);
       if (cashier) {
         setSelectedCashier(cashier);
@@ -48,7 +28,6 @@ const CashierSelector: FC<Props> = ({ onSelect, selectedCashierId }) => {
 
   const handleSelect = (cashier: Cashier) => {
     setSelectedCashier(cashier);
-    localStorage.setItem("selectedCashierId", cashier.id.toString());
     onSelect(cashier);
   };
 
@@ -78,7 +57,6 @@ const CashierSelector: FC<Props> = ({ onSelect, selectedCashierId }) => {
 
   const handleClear = () => {
     setSelectedCashier(null);
-    localStorage.removeItem("selectedCashierId");
     onSelect(null as any); // Clear parent state
   };
 
