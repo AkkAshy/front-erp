@@ -1,6 +1,7 @@
 import { type FC, useEffect, useState } from "react";
 import CreateModal from "../CreateModal";
 import { useProductVariants } from "@/entities/product/model/useProductVariants";
+import { useProfileInfo } from "@/entities/cashier/model/useProfileInfo";
 import { PrinterIcon } from "../icons";
 import JsBarcode from "jsbarcode";
 import axios from "axios";
@@ -25,6 +26,7 @@ type Props = {
 
 const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productName }) => {
   const variants = useProductVariants(productId);
+  const profile = useProfileInfo();
   const [serverStatus, setServerStatus] = useState<"checking" | "online" | "offline">("checking");
 
   useEffect(() => {
@@ -32,8 +34,8 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
       console.log("🎯 Варианты товара загружены:", {
         productId,
         productName,
-        totalVariants: variants.data.data.count,
-        variants: variants.data.data.results,
+        totalVariants: variants.data.data.length,
+        variants: variants.data.data,
       });
     }
   }, [variants.data, productId, productName]);
@@ -119,7 +121,9 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
     }
 
     try {
-      const svgString = createSVGLabel(variant);
+      // Получаем название магазина из профиля пользователя
+      const storeName = profile.data?.data?.store?.name || "Magazin";
+      const svgString = createSVGLabel(variant, storeName);
       const svgBase64 = svgToBase64(svgString);
       const imageData = `data:image/svg+xml;base64,${svgBase64}`;
 
@@ -207,7 +211,7 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
 
         {!variants.isLoading && !variants.isError && (
           <>
-            {variants.data?.data?.results?.length === 0 ? (
+            {variants.data?.data?.length === 0 ? (
               <div className={styles.empty}>
                 <img src="/empty.svg" alt="empty" />
                 <p>Bu mahsulotda variantlar mavjud emas</p>
@@ -216,7 +220,7 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
               <>
                 <div className={styles.summary}>
                   <p>
-                    Jami <strong>{variants.data?.data?.count || 0}</strong> ta variant topildi
+                    Jami <strong>{variants.data?.data?.length || 0}</strong> ta variant topildi
                   </p>
                 </div>
               <div className={styles.variantsList}>
@@ -231,7 +235,7 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
                   <div className={styles.headerCell}>Chop etish</div>
                 </div>
 
-                {variants.data?.data?.results?.map((variant, index) => {
+                {variants.data?.data?.map((variant, index) => {
                   const quantity = parseFloat(variant.quantity) || 0;
                   const salePrice = parseFloat(variant.sale_price) || 0;
 

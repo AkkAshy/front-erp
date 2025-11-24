@@ -31,15 +31,7 @@ export type ProductVariant = {
 };
 
 export type ProductVariantsResponse = {
-  data: {
-    count: number;
-    next: string | null;
-    previous: string | null;
-    results: ProductVariant[];
-    tenant_key: string;
-    store_name: string;
-    store_slug: string;
-  };
+  data: ProductVariant[];
 };
 
 export const useProductVariants = (
