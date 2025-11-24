@@ -2,11 +2,37 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { productApi } from "../api/productApi";
 import type { ProductItem } from "../api/types";
 
-// Backend response structure - ИСПРАВЛЕНО согласно реальному API
-// Backend возвращает товар напрямую в data, а не в data.product
-type ScanBarcodeResponse = {
-  status: "success";
-  data: ProductItem;  // Товар напрямую, без обертки {product: ...}
+// Новый warehouse scan API response
+export type VariantScanData = {
+  id: number;
+  product_id: number;
+  product_name: string;
+  sku: string;
+  barcode: string;
+  display_name: string;
+  current_quantity: number;
+  price: number;
+  attributes: Array<{
+    attribute: string;
+    value: string;
+  }>;
+};
+
+export type ProductScanData = {
+  id: number;
+  name: string;
+  sku: string;
+  barcode: string;
+  current_quantity: number;
+  price: number;
+};
+
+export type ScanBarcodeResponse = {
+  status: "found" | "not_found";
+  type?: "variant" | "product";
+  data?: VariantScanData | ProductScanData;
+  message?: string;
+  barcode?: string;
 };
 
 export const useScanBarcode = (

@@ -4,11 +4,9 @@ import type { CreateProduct, UpdateProduct, CreateBatch, UpdateBatch } from "./t
 export const productApi = {
   // ===== PRODUCTS =====
 
-  // Scan barcode - поиск товара по штрихкоду
+  // Scan barcode - поиск товара по штрихкоду (новый warehouse scan API)
   scanBarcode: (barcode: string) =>
-    api.get(`/products/products/scan_barcode/`, {
-      params: { barcode },
-    }),
+    api.post(`/products/warehouse-scan/scan/`, { barcode }),
 
   // Create product - создание товара (полная информация в одном запросе)
   create: (data: CreateProduct) =>
@@ -169,4 +167,18 @@ export const productApi = {
 
   getAvailableSizes: (params: { name?: string }) =>
     api.get("/inventory/products/sizes_summary/", { params }),
+
+  // ===== WAREHOUSE SCAN =====
+
+  // Add batch via warehouse scan - добавление партии через складской сканер
+  warehouseAddBatch: (data: {
+    type: "variant" | "product";
+    id: number;
+    batch_number: string;
+    quantity: number;
+    purchase_price: number;
+    supplier?: number;
+    manufacturing_date?: string;
+    expiry_date?: string;
+  }) => api.post("/products/warehouse-scan/add-batch/", data),
 };

@@ -54,8 +54,21 @@ const Inventory = () => {
 
   const [scannedCode, setScannedCode] = useState<string>("");
   const scanBarcode = useScanBarcode(scannedCode);
+
+  // Получаем имя товара из нового API response
+  const getProductName = () => {
+    if (scanBarcode.data?.status === "found") {
+      if (scanBarcode.data.type === "variant") {
+        return (scanBarcode.data.data as any)?.display_name || "";
+      } else if (scanBarcode.data.type === "product") {
+        return (scanBarcode.data.data as any)?.name || "";
+      }
+    }
+    return "";
+  };
+
   const availableSizes = useAvailableSizes({
-    name: scanBarcode.data?.data?.name?.split(" ")[0] || "",
+    name: getProductName().split(" ")[0] || "",
   });
 
   const [userId, setUserId] = useState<number | string>("");
@@ -159,8 +172,8 @@ const Inventory = () => {
           setScannedCode("");
           setIsOpenScaner(false);
         }}
-        width={560}
-        height={560}
+        width={400}
+        height={400}
         mt={0}
         children={
           <DotLottieReact
@@ -286,7 +299,7 @@ const Inventory = () => {
         }}
         width={964}
         height={634}
-        headTitle={scanBarcode.data?.data?.name || ""}
+        headTitle={getProductName()}
         overflowY="scroll"
       >
         <ul className={styles.sizes__list}>
