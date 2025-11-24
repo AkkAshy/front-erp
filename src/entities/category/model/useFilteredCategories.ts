@@ -5,10 +5,13 @@ import type { Category } from "../api/types";
 export const useFilteredCategories = (filters: {
   offset?: number;
   limit?: number;
-}): UseQueryResult<{ data: Category }, Error> => {
+}): UseQueryResult<Category, Error> => {
   return useQuery({
     queryKey: ["categories", filters],
-    queryFn: () => categoryApi.getFilteredCategories(filters),
+    queryFn: async () => {
+      const response = await categoryApi.getFilteredCategories(filters);
+      return response.data;
+    },
     staleTime: 5 * 60 * 1000,
   });
 };

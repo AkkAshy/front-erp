@@ -2,9 +2,12 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { productApi } from "../api/productApi";
 import type { Size } from "../api/types";
 
-export const useSizes = (): UseQueryResult<{ data: Size }, Error> => {
+export const useSizes = (): UseQueryResult<Size, Error> => {
   return useQuery({
     queryKey: ["sizes"],
-    queryFn: () => productApi.getAllSizes(),
+    queryFn: async () => {
+      const response = await productApi.getAllSizes();
+      return response.data;
+    },
   });
 };

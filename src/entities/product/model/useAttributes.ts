@@ -34,9 +34,12 @@ export type AttributesResponse = {
   };
 };
 
-export const useAttributes = (): UseQueryResult<AttributesResponse, Error> => {
+export const useAttributes = (): UseQueryResult<AttributesResponse["data"], Error> => {
   return useQuery({
     queryKey: ["attributes"],
-    queryFn: () => productApi.getAllAttributes(),
+    queryFn: async () => {
+      const response = await productApi.getAllAttributes();
+      return response.data;
+    },
   });
 };

@@ -83,7 +83,7 @@ const History = () => {
 
       <Table
         headCols={headCols}
-        bodyCols={filteredTransactions.data?.data?.results.map(
+        bodyCols={Array.isArray(filteredTransactions.data?.results) ? filteredTransactions.data.results.map(
           (item, index) => {
             return {
               id: item.id,
@@ -113,7 +113,7 @@ const History = () => {
                 ) + " uzs",
             };
           }
-        )}
+        ) : []}
         headCell={{
           1: {
             className: styles.cell__hash,
@@ -137,7 +137,7 @@ const History = () => {
         isLoading={filteredTransactions.isLoading}
       />
 
-      {filteredTransactions.data?.data?.results.length === 0 && (
+      {filteredTransactions.data?.results?.length === 0 && (
         <div className={styles.empty}>
           <img src="/empty.svg" alt="empty" />
         </div>
@@ -145,7 +145,7 @@ const History = () => {
 
       <TablePagination
         current={page}
-        total={filteredTransactions.data?.data?.count || 0}
+        total={filteredTransactions.data?.count || 0}
         pageSize={limit}
         onChange={(p) => setPage(p)}
         

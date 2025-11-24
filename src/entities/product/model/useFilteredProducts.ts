@@ -13,10 +13,13 @@ type Filters = {
 
 export const useFilteredProducts = (
   filters: Filters
-): UseQueryResult<{ data: Product }, Error> => {
+): UseQueryResult<Product, Error> => {
   return useQuery({
     queryKey: ["products", filters],
-    queryFn: () => productApi.getFilteredProducts(filters),
+    queryFn: async () => {
+      const response = await productApi.getFilteredProducts(filters);
+      return response.data;
+    },
     staleTime: 5 * 60 * 1000,
   });
 };

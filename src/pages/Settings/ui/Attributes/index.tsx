@@ -112,7 +112,7 @@ const Attributes = () => {
       </div>
 
       <div className={styles.attributesList}>
-        {attributeTypes.data?.data?.results?.map((type: any) => (
+        {Array.isArray(attributeTypes.data?.results) ? attributeTypes.data.results?.map((type: any) => (
           <div key={type.id} className={styles.attributeCard}>
             <div className={styles.attributeHeader}>
               <div className={styles.attributeTitleRow}>
@@ -145,12 +145,12 @@ const Attributes = () => {
                 <div className={styles.valuesList}>
                   {attributeValues.isLoading ? (
                     <div className={styles.loading}>Загрузка...</div>
-                  ) : !attributeValues.data?.data?.results || attributeValues.data.data.results.length === 0 ? (
+                  ) : !attributeValues.data?.results || attributeValues.data.results.length === 0 ? (
                     <div className={styles.emptyValues}>
                       Нет значений. Добавьте первое значение
                     </div>
                   ) : (
-                    attributeValues.data.data.results.map((value: any) => (
+                    attributeValues.data.results.map((value: any) => (
                       <div key={value.id} className={styles.valueItem}>
                         <div className={styles.valueInfo}>
                           <span className={styles.valueName}>{value.value}</span>
@@ -169,7 +169,7 @@ const Attributes = () => {
               </div>
             )}
           </div>
-        ))}
+        )) : []}
       </div>
 
       <CreateModal

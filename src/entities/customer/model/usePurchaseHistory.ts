@@ -5,10 +5,13 @@ import type { PurchaseHistoryResult } from "../api/types";
 export const usePurchaseHistory = (
   id: number,
   params?: { offset?: number; limit?: number }
-): UseQueryResult<{ data: PurchaseHistoryResult }, Error> => {
+): UseQueryResult<PurchaseHistoryResult, Error> => {
   return useQuery({
     queryKey: ["purchase-history", id, params],
-    queryFn: () => customersApi.getPurchaseHistory(id, params),
+    queryFn: async () => {
+      const response = await customersApi.getPurchaseHistory(id, params);
+      return response.data;
+    },
     enabled: !!id,
   });
 };

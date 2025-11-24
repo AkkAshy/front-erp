@@ -40,7 +40,7 @@ const UpdateProduct: FC<Props> = ({
   const productsData = useProducts();
 
   useEffect(() => {
-    const product = productsData?.data?.data.results?.find(
+    const product = productsData?.data?.results?.find(
       (item) => item.id === updateId
     );
 
@@ -81,7 +81,7 @@ const UpdateProduct: FC<Props> = ({
       );
       setSalePrice(((+product.sale_price) || 0).toLocaleString("de-DE"));
     }
-  }, [productsData.data?.data.results, updateId]);
+  }, [productsData.data?.results, updateId]);
 
   return (
     <>
@@ -109,7 +109,7 @@ const UpdateProduct: FC<Props> = ({
         }}
         btnOnClick={() => {
           // Update batch only if we have batches data
-          const product = productsData?.data?.data.results?.find(
+          const product = productsData?.data?.results?.find(
             (item) => item.id === updateId
           );
 

@@ -4,10 +4,13 @@ import type { CustomerStats } from "../api/types";
 
 export const useCustomerStats = (
   id: number
-): UseQueryResult<{ data: CustomerStats }, Error> => {
+): UseQueryResult<CustomerStats, Error> => {
   return useQuery({
     queryKey: ["customer-stats", id],
-    queryFn: () => customersApi.getStats(id),
+    queryFn: async () => {
+      const response = await customersApi.getStats(id);
+      return response.data;
+    },
     enabled: !!id,
   });
 };

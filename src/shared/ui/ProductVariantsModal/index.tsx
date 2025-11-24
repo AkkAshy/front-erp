@@ -30,12 +30,12 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
   const [serverStatus, setServerStatus] = useState<"checking" | "online" | "offline">("checking");
 
   useEffect(() => {
-    if (variants.data?.data) {
+    if (variants.data?.results) {
       console.log("🎯 Варианты товара загружены:", {
         productId,
         productName,
-        totalVariants: variants.data.data.length,
-        variants: variants.data.data,
+        totalVariants: variants.data.results.length,
+        variants: variants.data.results,
       });
     }
   }, [variants.data, productId, productName]);
@@ -211,7 +211,7 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
 
         {!variants.isLoading && !variants.isError && (
           <>
-            {variants.data?.data?.length === 0 ? (
+            {variants.data?.results?.length === 0 ? (
               <div className={styles.empty}>
                 <img src="/empty.svg" alt="empty" />
                 <p>Bu mahsulotda variantlar mavjud emas</p>
@@ -220,7 +220,7 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
               <>
                 <div className={styles.summary}>
                   <p>
-                    Jami <strong>{variants.data?.data?.length || 0}</strong> ta variant topildi
+                    Jami <strong>{variants.data?.results?.length || 0}</strong> ta variant topildi
                   </p>
                 </div>
               <div className={styles.variantsList}>
@@ -235,7 +235,7 @@ const ProductVariantsModal: FC<Props> = ({ isOpen, onClose, productId, productNa
                   <div className={styles.headerCell}>Chop etish</div>
                 </div>
 
-                {variants.data?.data?.map((variant, index) => {
+                {Array.isArray(variants.data?.results) && variants.data.results.map((variant, index) => {
                   const quantity = parseFloat(variant.quantity) || 0;
                   const salePrice = parseFloat(variant.sale_price) || 0;
 

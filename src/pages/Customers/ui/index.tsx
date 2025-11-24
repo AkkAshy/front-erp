@@ -80,10 +80,10 @@ const Customers = () => {
   }, []);
 
   useEffect(() => {
-    if (filteredCustomers.data?.data?.results) {
-      setCustomersData(filteredCustomers.data?.data?.results);
+    if (filteredCustomers.data?.results) {
+      setCustomersData(filteredCustomers.data?.results);
     }
-  }, [filteredCustomers.data?.data?.results]);
+  }, [filteredCustomers.data?.results]);
 
 
   return (
@@ -204,7 +204,7 @@ const Customers = () => {
         isLoading={filteredCustomers.isLoading}
       />
 
-      {filteredCustomers.data?.data?.results.length === 0 && (
+      {filteredCustomers.data?.results?.length === 0 && (
         <div className={styles.empty}>
           <img src="/empty.svg" alt="empty" />
         </div>
@@ -223,7 +223,7 @@ const Customers = () => {
 
       <TablePagination
         current={page}
-        total={filteredCustomers.data?.data?.count || 0}
+        total={filteredCustomers.data?.count || 0}
         pageSize={limit}
         onChange={(p) => setPage(p)}
         

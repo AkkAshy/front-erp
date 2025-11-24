@@ -5,10 +5,13 @@ import type { AttributeTypeList } from "../api/types";
 export const useAttributeTypes = (params?: {
   offset?: number;
   limit?: number;
-}): UseQueryResult<{ data: AttributeTypeList }, Error> => {
+}): UseQueryResult<AttributeTypeList, Error> => {
   return useQuery({
     queryKey: ["attributeTypes", params],
-    queryFn: () => attributeApi.getAllTypes(params),
+    queryFn: async () => {
+      const response = await attributeApi.getAllTypes(params);
+      return response.data;
+    },
     staleTime: 5 * 60 * 1000,
   });
 };

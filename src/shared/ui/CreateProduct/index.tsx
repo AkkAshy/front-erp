@@ -531,7 +531,7 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
                   <div style={{ padding: '12px', textAlign: 'center', color: '#666' }}>
                     Atributlar yuklanmoqda...
                   </div>
-                ) : !Array.isArray(attributes.data?.data?.results) || attributes.data?.data?.results?.length === 0 ? (
+                ) : !Array.isArray(attributes.data?.results) || attributes.data?.results?.length === 0 ? (
                   <div style={{ padding: '12px', background: '#fff7e6', borderRadius: '8px', color: '#ff9800', fontSize: '13px' }}>
                     ⚠️ Atributlar topilmadi. Avval Sozlamalar → Atributlar bo'limidan atributlar yarating.
                   </div>
@@ -557,7 +557,7 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
                         }}
                       >
                         <option value="">Atributni tanlang...</option>
-                        {attributes.data?.data?.results
+                        {attributes.data?.results
                           ?.filter((attr) => !variant.attributes[attr.id]) // Скрываем уже добавленные атрибуты
                           ?.map((attr) => (
                             <option key={attr.id} value={attr.id}>
@@ -604,7 +604,7 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
                       >
                         <option value="">Qiymatni tanlang...</option>
                         {variant.selectedAttributeId &&
-                          attributes.data?.data?.results
+                          attributes.data?.results
                             ?.find((attr) => attr.id === variant.selectedAttributeId)
                             ?.values?.map((val) => (
                               <option key={val.id} value={val.id}>
@@ -660,8 +660,8 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
                 ) : (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {Object.entries(variant.attributes).map(([attrId, valueId]) => {
-                      const attr = Array.isArray(attributes.data?.data?.results)
-                        ? attributes.data?.data?.results?.find((a) => a.id === Number(attrId))
+                      const attr = Array.isArray(attributes.data?.results)
+                        ? attributes.data?.results?.find((a) => a.id === Number(attrId))
                         : null;
                       const value = attr?.values?.find((v) => v.id === valueId);
                       return (

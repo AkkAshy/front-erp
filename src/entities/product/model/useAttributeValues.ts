@@ -19,10 +19,13 @@ export type AttributeValuesResponse = {
 
 export const useAttributeValues = (
   attributeId: number | null
-): UseQueryResult<AttributeValuesResponse, Error> => {
+): UseQueryResult<AttributeValuesResponse["data"], Error> => {
   return useQuery({
     queryKey: ["attribute-values", attributeId],
-    queryFn: () => productApi.getAttributeValues(attributeId!),
+    queryFn: async () => {
+      const response = await productApi.getAttributeValues(attributeId!);
+      return response.data;
+    },
     enabled: !!attributeId,
   });
 };

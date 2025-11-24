@@ -8,7 +8,10 @@ export const useAttributeValues = (params?: {
 }) => {
   return useQuery({
     queryKey: ["attributeValues", params],
-    queryFn: () => attributeApi.getAllValues(params),
+    queryFn: async () => {
+      const response = await attributeApi.getAllValues(params);
+      return response.data;
+    },
     staleTime: 5 * 60 * 1000,
     enabled: !!params?.attribute, // Изменено с attribute_type
   });

@@ -186,7 +186,7 @@ const Inventory = () => {
 
       <Table
         headCols={headCols}
-        bodyCols={filteredProducts.data?.data?.results.map((item, index) => {
+        bodyCols={Array.isArray(filteredProducts.data?.results) ? filteredProducts.data.results.map((item, index) => {
           // В реальном API количество в корне объекта, не в inventory
           const quantity = item.quantity || item.inventory?.quantity || item.current_stock || "0";
           // Маржа тоже в корне объекта
@@ -228,7 +228,7 @@ const Inventory = () => {
               </div>
             ),
           };
-        })}
+        }) : []}
         headCell={{
           1: {
             className: styles.cell__hash,
@@ -274,7 +274,7 @@ const Inventory = () => {
         isLoading={filteredProducts.isLoading}
         onRowClick={(row) => {
           console.log("Клик на товар:", row);
-          const product = filteredProducts.data?.data?.results.find((p) => p.id === row.id);
+          const product = filteredProducts.data?.results?.find((p) => p.id === row.id);
           if (product) {
             setSelectedProductId(product.id);
             setSelectedProductName(product.name);
@@ -283,7 +283,7 @@ const Inventory = () => {
         }}
       />
 
-      {filteredProducts.data?.data?.results.length === 0 && (
+      {filteredProducts.data?.results?.length === 0 && (
         <div className={styles.empty}>
           <img src="/empty.svg" alt="empty" />
         </div>
@@ -363,7 +363,7 @@ const Inventory = () => {
 
       <TablePagination
         current={page}
-        total={filteredProducts.data?.data?.count || 0}
+        total={filteredProducts.data?.count || 0}
         pageSize={limit}
         onChange={(p) => setPage(p)}
 

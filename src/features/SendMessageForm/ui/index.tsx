@@ -207,7 +207,7 @@ const SendMessageForm: FC<Props> = ({
               )}
               onClick={(e) => e.stopPropagation()}
             >
-              {getSmsTemplate.data?.data?.map((item) => (
+              {Array.isArray(getSmsTemplate.data?.data) && getSmsTemplate.data.data.map((item) => (
                 <li
                   key={item.id}
                   onClick={() => {

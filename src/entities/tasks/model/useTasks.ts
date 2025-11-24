@@ -24,7 +24,10 @@ export const useGetTasks = (params?: {
 }) => {
   return useQuery({
     queryKey: taskKeys.list(params),
-    queryFn: () => taskApi.getAllTasks(params),
+    queryFn: async () => {
+      const response = await taskApi.getAllTasks(params);
+      return response.data;
+    },
   });
 };
 
@@ -32,7 +35,10 @@ export const useGetTasks = (params?: {
 export const useGetMyTasks = () => {
   return useQuery({
     queryKey: taskKeys.myTasks(),
-    queryFn: () => taskApi.getMyTasks(),
+    queryFn: async () => {
+      const response = await taskApi.getMyTasks();
+      return response.data;
+    },
   });
 };
 
@@ -40,7 +46,10 @@ export const useGetMyTasks = () => {
 export const useGetOverdueTasks = () => {
   return useQuery({
     queryKey: taskKeys.overdue(),
-    queryFn: () => taskApi.getOverdueTasks(),
+    queryFn: async () => {
+      const response = await taskApi.getOverdueTasks();
+      return response.data;
+    },
   });
 };
 
@@ -48,7 +57,10 @@ export const useGetOverdueTasks = () => {
 export const useGetTodayTasks = () => {
   return useQuery({
     queryKey: taskKeys.today(),
-    queryFn: () => taskApi.getTodayTasks(),
+    queryFn: async () => {
+      const response = await taskApi.getTodayTasks();
+      return response.data;
+    },
   });
 };
 
@@ -56,7 +68,10 @@ export const useGetTodayTasks = () => {
 export const useGetTask = (id: number) => {
   return useQuery({
     queryKey: taskKeys.detail(id),
-    queryFn: () => taskApi.getTask(id),
+    queryFn: async () => {
+      const response = await taskApi.getTask(id);
+      return response.data;
+    },
     enabled: !!id,
   });
 };

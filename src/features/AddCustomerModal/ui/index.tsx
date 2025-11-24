@@ -46,7 +46,7 @@ const AddCustomerModal: FC<Props> = ({
       return;
     }
 
-    if (customers.data?.data.results.find((c) => c.phone === normalizedPhone)) {
+    if (customers.data?.results?.find((c) => c.phone === normalizedPhone)) {
       setError("Bunday mijoz allaqachon mavjud");
       return;
     }

@@ -12,10 +12,13 @@ type Filters = {
 
 export const useFilteredCustomers = (
   filters: Filters
-): UseQueryResult<{ data: CustomersResult }, Error> => {
+): UseQueryResult<CustomersResult, Error> => {
   return useQuery({
     queryKey: ["customers", filters],
-    queryFn: () => customersApi.getFilteredCustomers(filters),
+    queryFn: async () => {
+      const response = await customersApi.getFilteredCustomers(filters);
+      return response.data;
+    },
     staleTime: 5 * 60 * 1000,
   });
 };

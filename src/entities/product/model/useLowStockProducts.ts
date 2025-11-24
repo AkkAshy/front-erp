@@ -9,10 +9,13 @@ type Results = {
 };
 export const useLowStockProducts = (
   min_quantity: number = 5
-): UseQueryResult<{ data: Results }, Error> => {
+): UseQueryResult<Results, Error> => {
   return useQuery({
     queryKey: ["low-stock-products", min_quantity],
-    queryFn: () => productApi.getLowStockProducts(min_quantity),
+    queryFn: async () => {
+      const response = await productApi.getLowStockProducts(min_quantity);
+      return response.data;
+    },
     staleTime: 5 * 60 * 1000,
   });
 };

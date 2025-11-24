@@ -30,10 +30,10 @@ const SelectSizes: FC<Props> = ({
     sizesData.length > 0 && sizesData.every((item) => item.selected);
 
   useEffect(() => {
-    if (filteredSizes.data?.data.results) {
-      setSizesData(filteredSizes.data?.data.results);
+    if (filteredSizes.data?.results) {
+      setSizesData(filteredSizes.data.results);
     }
-  }, [filteredSizes.data?.data.results]);
+  }, [filteredSizes.data?.results]);
 
   useEffect(() => {
     setSelectedSizes(sizesData.filter((item) => item.selected));

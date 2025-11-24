@@ -222,13 +222,13 @@ const Barcode = () => {
         )}
       </h3>
 
-      {barcodes.data?.data?.results.length === 0 ? (
+      {barcodes.data?.results?.length === 0 ? (
         <div className={styles.empty}>
           <img src="/empty.svg" alt="empty" />
         </div>
       ) : (
         <ul className={styles.barcode__list}>
-          {barcodes.data?.data?.results.map((item) => (
+          {Array.isArray(barcodes.data?.results) ? barcodes.data.results.map((item) => (
             <li key={item.id} className={styles.barcode__item}>
               <div className={styles.item__header}>
                 <span className={styles.size}>{item.size?.size ?? "-"}</span>
@@ -261,7 +261,7 @@ const Barcode = () => {
                 </span>
               </div>
             </li>
-          ))}
+          )) : []}
         </ul>
       )}
     </div>

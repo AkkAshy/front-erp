@@ -24,14 +24,17 @@ export type ProductVariant = {
   attributes: VariantAttribute[];
   display_name: string;
   sale_price: string;  // Итоговая цена продажи (с учетом price_override или родителя)
-  cost_price: string;  // Цена закупки (от родителя или из партий)
+  cost_price?: string;  // Цена закупки (от родителя или из партий) - optional
   quantity: string;
   created_at: string;
   updated_at: string;
 };
 
 export type ProductVariantsResponse = {
-  data: ProductVariant[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: ProductVariant[];
 };
 
 export const useProductVariants = (
@@ -39,7 +42,10 @@ export const useProductVariants = (
 ): UseQueryResult<ProductVariantsResponse, Error> => {
   return useQuery({
     queryKey: ["product-variants", productId],
-    queryFn: () => productApi.getVariantsByProduct(productId!),
+    queryFn: async () => {
+      const response = await productApi.getVariantsByProduct(productId!);
+      return response.data;
+    },
     enabled: !!productId,
   });
 };

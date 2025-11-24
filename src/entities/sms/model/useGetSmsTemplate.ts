@@ -13,6 +13,9 @@ export const useGetSmsTemplate = (): UseQueryResult<
 > => {
   return useQuery({
     queryKey: ["get-sms-template"],
-    queryFn: () => smsApi.getSmsTemplate(),
+    queryFn: async () => {
+      const response = await smsApi.getSmsTemplate();
+      return response.data;
+    },
   });
 };

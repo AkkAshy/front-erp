@@ -3,11 +3,14 @@ import { customersApi } from "../api/customersApi";
 import type { CustomersResult } from "../api/types";
 
 export const useCustomers = (): UseQueryResult<
-  { data: CustomersResult },
+  CustomersResult,
   Error
 > => {
   return useQuery({
     queryKey: ["customers"],
-    queryFn: () => customersApi.getAll(),
+    queryFn: async () => {
+      const response = await customersApi.getAll();
+      return response.data;
+    },
   });
 };

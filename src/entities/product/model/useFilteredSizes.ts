@@ -6,10 +6,13 @@ export const useFilteredSizes = (filters: {
   search?: string;
   offset?: number;
   limit?: number;
-}): UseQueryResult<{ data: Size }, Error> => {
+}): UseQueryResult<Size, Error> => {
   return useQuery({
     queryKey: ["sizes", filters],
-    queryFn: () => productApi.getFilteredSizes(filters),
+    queryFn: async () => {
+      const response = await productApi.getFilteredSizes(filters);
+      return response.data;
+    },
     staleTime: 5 * 60 * 1000,
   });
 };

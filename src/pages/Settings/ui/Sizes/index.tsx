@@ -100,8 +100,8 @@ const Sizes = () => {
       </CreateModal>
 
       <Table
-        headCols={["#", "O’lchov nomi", "", ""]}
-        bodyCols={filteredSizes.data?.data.results.map((item, index) => {
+        headCols={["#", "O'lchov nomi", "", ""]}
+        bodyCols={Array.isArray(filteredSizes.data?.results) ? filteredSizes.data.results.map((item, index) => {
           return {
             id: item.id,
             index: index + 1 + offset,
@@ -128,7 +128,7 @@ const Sizes = () => {
               </div>
             ),
           };
-        })}
+        }) : []}
         headCell={{
           1: {
             className: styles.cell__hash,
@@ -158,7 +158,7 @@ const Sizes = () => {
         isLoading={filteredSizes.isLoading}
       />
 
-      {filteredSizes.data?.data?.results.length === 0 && (
+      {filteredSizes.data?.results?.length === 0 && (
         <div className={styles.empty}>
           <img src="/empty.svg" alt="empty" />
         </div>
@@ -210,7 +210,7 @@ const Sizes = () => {
 
       <TablePagination
         current={page}
-        total={filteredSizes.data?.data.count || 0}
+        total={filteredSizes.data?.count || 0}
         pageSize={limit}
         onChange={(p) => setPage(p)}
         

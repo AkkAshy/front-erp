@@ -189,7 +189,7 @@ const Category = () => {
         <div className={styles.attributesSection}>
           <label>Atributlar</label>
           <div className={styles.attributesList}>
-            {attributeTypes.data?.data?.results?.map((attr: any) => (
+            {Array.isArray(attributeTypes.data?.results) ? attributeTypes.data.results?.map((attr: any) => (
               <label key={attr.id} className={styles.checkboxLabel}>
                 <input
                   type="checkbox"
@@ -198,14 +198,14 @@ const Category = () => {
                 />
                 <span>{attr.name}</span>
               </label>
-            ))}
+            )) : []}
           </div>
         </div>
       </CreateModal>
 
       <Table
         headCols={["#", "Kategoriya nomi", "", ""]}
-        bodyCols={filteredCategories.data?.data.results.map((item, index) => {
+        bodyCols={Array.isArray(filteredCategories.data?.results) ? filteredCategories.data.results.map((item, index) => {
           return {
             id: item.id,
             index: index + 1 + offset,
@@ -232,7 +232,7 @@ const Category = () => {
               </div>
             ),
           };
-        })}
+        }) : []}
         headCell={{
           1: {
             className: styles.cell__hash,
@@ -259,7 +259,7 @@ const Category = () => {
         isLoading={filteredCategories.isLoading}
       />
 
-      {filteredCategories.data?.data?.results.length === 0 && (
+      {filteredCategories.data?.results?.length === 0 && (
         <div className={styles.empty}>
           <img src="/empty.svg" alt="empty" />
         </div>
@@ -323,7 +323,7 @@ const Category = () => {
             {categoryAttributes.isLoading ? (
               <div>Yuklanmoqda...</div>
             ) : (
-              attributeTypes.data?.data?.results?.map((attr: any) => (
+              Array.isArray(attributeTypes.data?.results) ? attributeTypes.data.results?.map((attr: any) => (
                 <label key={attr.id} className={styles.checkboxLabel}>
                   <input
                     type="checkbox"
@@ -332,7 +332,7 @@ const Category = () => {
                   />
                   <span>{attr.name}</span>
                 </label>
-              ))
+              )) : []
             )}
           </div>
         </div>
@@ -340,7 +340,7 @@ const Category = () => {
 
       <TablePagination
         current={page}
-        total={filteredCategories.data?.data.count || 0}
+        total={filteredCategories.data?.count || 0}
         pageSize={limit}
         onChange={(p) => setPage(p)}
         
