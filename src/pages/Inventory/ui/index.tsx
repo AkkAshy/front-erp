@@ -13,6 +13,7 @@ import CreateProduct from "@/shared/ui/CreateProduct";
 import UpdateProduct from "@/shared/ui/UpdateProduct";
 import TablePagination from "@/shared/ui/Pagination";
 import ProductVariantsModal from "@/shared/ui/ProductVariantsModal";
+import AddBatchModal from "@/shared/ui/AddBatchModal";
 
 import DeleteConfirmModal from "@/features/DeleteConfirmModal/ui";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
@@ -22,7 +23,6 @@ import { useDeleteProduct } from "@/entities/product/model/useDeleteProduct";
 import { usePagination } from "@/shared/lib/hooks/usePagination";
 import { useBarcodeScanner } from "@/shared/lib/hooks/useBarcodeScanner";
 import { useScanBarcode } from "@/entities/product/model/useScanBarcode";
-import { useAvailableSizes } from "@/entities/product/model/useAvailableSizes";
 
 //scss
 import styles from "./Inventory.module.scss";
@@ -49,27 +49,12 @@ const Inventory = () => {
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [isCategoryDropdown, setIsCategoryDropdown] = useState(false);
   const [isOpenSellers, setIsOpenSellers] = useState(false);
-  const [isOpenProductInfo, setIsOpenProductInfo] = useState(false);
   const [isOpenVariants, setIsOpenVariants] = useState(false);
+  const [isOpenAddBatch, setIsOpenAddBatch] = useState(false);
 
   const [scannedCode, setScannedCode] = useState<string>("");
   const scanBarcode = useScanBarcode(scannedCode);
 
-  // Получаем имя товара из нового API response
-  const getProductName = () => {
-    if (scanBarcode.data?.status === "found") {
-      if (scanBarcode.data.type === "variant") {
-        return (scanBarcode.data.data as any)?.display_name || "";
-      } else if (scanBarcode.data.type === "product") {
-        return (scanBarcode.data.data as any)?.name || "";
-      }
-    }
-    return "";
-  };
-
-  const availableSizes = useAvailableSizes({
-    name: getProductName().split(" ")[0] || "",
-  });
 
   const [userId, setUserId] = useState<number | string>("");
   const [categoryId, setCategoryId] = useState<number | string>("");
@@ -99,12 +84,13 @@ const Inventory = () => {
 
   useBarcodeScanner({ onScan: handleScan, enabled: isOpenScaner });
 
+  // Открываем модальное окно добавления партии когда товар найден
   useEffect(() => {
-    if ((availableSizes.data?.data?.by_size?.length ?? 0) >= 1) {
-      setIsOpenProductInfo(true);
+    if (scanBarcode.data?.status === "found" && scannedCode) {
       setIsOpenScaner(false);
+      setIsOpenAddBatch(true);
     }
-  }, [availableSizes.data?.data?.by_size?.length]);
+  }, [scanBarcode.data?.status, scannedCode]);
 
   console.log(lowStock.data?.data);
 
@@ -291,29 +277,6 @@ const Inventory = () => {
         </div>
       )}
 
-      <CreateModal
-        isOpen={isOpenProductInfo}
-        onClose={() => {
-          setScannedCode("");
-          setIsOpenProductInfo(false);
-        }}
-        width={964}
-        height={634}
-        headTitle={getProductName()}
-        overflowY="scroll"
-      >
-        <ul className={styles.sizes__list}>
-          {(availableSizes.data?.data?.by_size ?? []).map((item) => (
-            <li key={item.size__size} className={styles.item}>
-              <p className={styles.size__title}>
-                “{item.size__size}” Tovar soni
-              </p>
-              <span className={styles.size__count}>{item.total_stock} pts</span>
-            </li>
-          ))}
-        </ul>
-      </CreateModal>
-
       <Notification
         type="success"
         message="Muvaffaqiyat"
@@ -370,6 +333,20 @@ const Inventory = () => {
         }}
         productId={selectedProductId}
         productName={selectedProductName}
+      />
+
+      <AddBatchModal
+        isOpen={isOpenAddBatch}
+        onClose={() => {
+          setIsOpenAddBatch(false);
+          setScannedCode("");
+        }}
+        scanType={scanBarcode.data?.type || null}
+        scanData={scanBarcode.data?.data || null}
+        onSuccess={() => {
+          // Можно показать уведомление об успехе
+          console.log("✅ Партия успешно добавлена");
+        }}
       />
 
       <TablePagination
