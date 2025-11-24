@@ -12,6 +12,7 @@ import SelectSeller from "@/shared/ui/SelectSeller";
 import CreateProduct from "@/shared/ui/CreateProduct";
 import UpdateProduct from "@/shared/ui/UpdateProduct";
 import TablePagination from "@/shared/ui/Pagination";
+import ProductVariantsModal from "@/shared/ui/ProductVariantsModal";
 
 import DeleteConfirmModal from "@/features/DeleteConfirmModal/ui";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
@@ -49,6 +50,7 @@ const Inventory = () => {
   const [isCategoryDropdown, setIsCategoryDropdown] = useState(false);
   const [isOpenSellers, setIsOpenSellers] = useState(false);
   const [isOpenProductInfo, setIsOpenProductInfo] = useState(false);
+  const [isOpenVariants, setIsOpenVariants] = useState(false);
 
   const [scannedCode, setScannedCode] = useState<string>("");
   const scanBarcode = useScanBarcode(scannedCode);
@@ -60,6 +62,8 @@ const Inventory = () => {
   const [categoryId, setCategoryId] = useState<number | string>("");
   const [updateId, setUpdateId] = useState<number>(0);
   const [deleteId, setDeleteId] = useState<number>(0);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [selectedProductName, setSelectedProductName] = useState<string>("");
 
   const [search, setSearch] = useState("");
 
@@ -245,12 +249,27 @@ const Inventory = () => {
           },
           9: {
             className: styles.edit__btn,
+            onClick: (e) => {
+              e.stopPropagation();
+            },
           },
           10: {
             className: styles.delete__btn,
+            onClick: (e) => {
+              e.stopPropagation();
+            },
           },
         }}
         isLoading={filteredProducts.isLoading}
+        onRowClick={(row) => {
+          console.log("Клик на товар:", row);
+          const product = filteredProducts.data?.data?.results.find((p) => p.id === row.id);
+          if (product) {
+            setSelectedProductId(product.id);
+            setSelectedProductName(product.name);
+            setIsOpenVariants(true);
+          }
+        }}
       />
 
       {filteredProducts.data?.data?.results.length === 0 && (
@@ -329,12 +348,23 @@ const Inventory = () => {
         />
       )}
 
+      <ProductVariantsModal
+        isOpen={isOpenVariants}
+        onClose={() => {
+          setIsOpenVariants(false);
+          setSelectedProductId(null);
+          setSelectedProductName("");
+        }}
+        productId={selectedProductId}
+        productName={selectedProductName}
+      />
+
       <TablePagination
         current={page}
         total={filteredProducts.data?.data?.count || 0}
         pageSize={limit}
         onChange={(p) => setPage(p)}
-        
+
       />
     </div>
   );

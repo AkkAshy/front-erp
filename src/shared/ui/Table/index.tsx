@@ -19,6 +19,7 @@ type Table = {
   headCell: CellType;
   bodyCell: CellType;
   isLoading?: boolean;
+  onRowClick?: (row: TableRow) => void;
 };
 
 const Table: FC<Table> = ({
@@ -27,6 +28,7 @@ const Table: FC<Table> = ({
   headCell,
   bodyCell,
   isLoading,
+  onRowClick,
 }) => {
   // if (!bodyCols?.length) return;
 
@@ -86,7 +88,11 @@ const Table: FC<Table> = ({
                   </tr>
                 ))
             : bodyCols.map(({ id: bodyId, ...bodyRow }) => (
-                <tr key={bodyId} className={styles.row}>
+                <tr
+                  key={bodyId}
+                  className={styles.row}
+                  style={{ cursor: onRowClick ? 'pointer' : 'default' }}
+                >
                   {headCols.map((_, colIndex) => {
                     const value = Object.values(bodyRow)[colIndex];
                     const customCell = bodyCell[colIndex + 1];
@@ -95,7 +101,16 @@ const Table: FC<Table> = ({
                       <td
                         key={colIndex}
                         className={customCell?.className || styles.default__td}
-                        onClick={customCell?.onClick}
+                        onClick={(e) => {
+                          // Если у ячейки есть свой onClick (например, кнопки редактирования/удаления),
+                          // используем его и не вызываем onRowClick
+                          if (customCell?.onClick) {
+                            customCell.onClick(e);
+                          } else if (onRowClick) {
+                            // Иначе вызываем обработчик клика на строку
+                            onRowClick({ id: bodyId, ...bodyRow });
+                          }
+                        }}
                         style={{ textAlign: customCell?.align }}
                       >
                         {customCell?.content ?? value}

@@ -68,26 +68,26 @@ const CreateModal: FC<ModalProps> = ({
             className={styles.modal__inner}
           >
             {children}
-          </div>
 
-          {btnTitle && (
-            <div
-              style={{ height: btnHeight, position: btnPosition }}
-              className={styles.modal__btns}
-            >
-              <span
-                onClick={btnDisabled ? undefined : btnOnClick}
-                style={{
-                  width: btnWidth,
-                  opacity: btnDisabled ? 0.5 : 1,
-                  cursor: btnDisabled ? 'not-allowed' : 'pointer'
-                }}
-                className={styles.btn_bottom}
+            {btnTitle && (
+              <div
+                style={{ height: btnHeight, position: btnPosition }}
+                className={styles.modal__btns}
               >
-                {btnTitle}
-              </span>
-            </div>
-          )}
+                <span
+                  onClick={btnDisabled ? undefined : btnOnClick}
+                  style={{
+                    width: btnWidth,
+                    opacity: btnDisabled ? 0.5 : 1,
+                    cursor: btnDisabled ? 'not-allowed' : 'pointer'
+                  }}
+                  className={styles.btn_bottom}
+                >
+                  {btnTitle}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -282,6 +282,8 @@ const Home = () => {
           setShowSuccessNotification(true);
           // Clear customer selection after successful checkout
           setSelectedCustomer(null);
+          // НЕ сбрасываем кассира - он должен остаться выбранным для следующих продаж
+          // setSelectedCashier(null);
         },
         onError: (error: any) => {
           setErrorMessage(error?.response?.data?.message || "Xatolik yuz berdi");

@@ -103,6 +103,31 @@ export const productApi = {
     limit?: number;
   }) => api.get("/products/attributes/", { params }),
 
+  // Get attribute values - получить значения атрибута
+  getAttributeValues: (attributeId: number) =>
+    api.get(`/products/attributes/${attributeId}/values/`),
+
+  // ===== VARIANTS (ВАРИАНТЫ ТОВАРА) =====
+
+  // Create variant - создать вариант товара
+  createVariant: (data: {
+    product: number;
+    attributes: { attribute: number; value: number }[];
+    price_override?: number;  // Цена продажи варианта (опционально, null = использует цену родителя)
+  }) => api.post("/products/variants/", data),
+
+  // Get product variants - получить все варианты товара
+  getProductVariants: (productId: number) =>
+    api.get(`/products/variants/`, { params: { product: productId } }),
+
+  // Get product variants by product ID - получить все варианты конкретного товара
+  getVariantsByProduct: (productId: number) =>
+    api.get(`/products/variants/by_product/${productId}/`),
+
+  // Delete variant - удалить вариант
+  deleteVariant: (id: number) =>
+    api.delete(`/products/variants/${id}/`),
+
   // ===== SUPPLIERS (ПОСТАВЩИКИ) =====
 
   // Get all suppliers
