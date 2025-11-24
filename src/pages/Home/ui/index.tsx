@@ -68,9 +68,9 @@ const Home = () => {
   const scanBarcode = useScanBarcode(scannedCode, !!scannedCode);
 
   // Get current sale data
-  // ИСПРАВЛЕНО: CurrentSaleResponse.data содержит Sale напрямую (не обернутый в { sale: ... })
-  const sale = currentSale.data?.data;  // data содержит Sale | null
-  const items = sale?.items || [];
+  // currentSale.data is CurrentSaleResponse which has { status, data: Sale | null }
+  const sale = currentSale.data?.data;  // Extract Sale from CurrentSaleResponse
+  const items = Array.isArray(sale?.items) ? sale.items : [];
   const totalAmount = parseFloat(sale?.total_amount || "0") || 0;
   const totalProductCount = items.reduce((acc: number, item: { quantity: string }) => acc + (parseFloat(item.quantity) || 0), 0);
 
@@ -78,10 +78,12 @@ const Home = () => {
   useEffect(() => {
     console.log('📊 Current sale data:', {
       hasData: !!currentSale.data,
+      rawResponse: currentSale.data,
       sale: sale,
+      itemsType: typeof sale?.items,
+      itemsIsArray: Array.isArray(sale?.items),
       itemsCount: items.length,
-      totalAmount,
-      rawData: currentSale.data
+      totalAmount
     });
   }, [currentSale.data, sale, items.length, totalAmount]);
 
