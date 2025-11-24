@@ -5,8 +5,25 @@ export const productApi = {
   // ===== PRODUCTS =====
 
   // Scan barcode - поиск товара по штрихкоду (новый warehouse scan API)
-  scanBarcode: (barcode: string) =>
-    api.post(`/products/warehouse-scan/scan/`, { barcode }),
+  scanBarcode: (barcode: string) => {
+    const endpoint = `/products/warehouse-scan/scan/`;
+    const requestBody = { barcode };
+
+    console.log('🔍 [SCAN BARCODE API CALL]');
+    console.log('📍 Endpoint:', endpoint);
+    console.log('📦 Request body:', JSON.stringify(requestBody, null, 2));
+    console.log('🌐 Full URL:', `${endpoint}`);
+
+    return api.post(endpoint, requestBody).then(response => {
+      console.log('✅ [SCAN BARCODE RESPONSE]');
+      console.log('📦 Response data:', JSON.stringify(response.data, null, 2));
+      return response;
+    }).catch(error => {
+      console.error('❌ [SCAN BARCODE ERROR]');
+      console.error('Error details:', error.response?.data || error.message);
+      throw error;
+    });
+  },
 
   // Create product - создание товара (полная информация в одном запросе)
   create: (data: CreateProduct) =>
@@ -179,5 +196,30 @@ export const productApi = {
     supplier?: number;
     manufacturing_date?: string;
     expiry_date?: string;
-  }) => api.post("/products/warehouse-scan/add-batch/", data),
+  }) => {
+    const endpoint = "/products/warehouse-scan/add-batch/";
+
+    console.log('📦 [ADD BATCH API CALL]');
+    console.log('📍 Endpoint:', endpoint);
+    console.log('📋 Request body:', JSON.stringify(data, null, 2));
+    console.log('🔢 Data details:', {
+      type: data.type,
+      id: data.id,
+      quantity: data.quantity,
+      purchase_price: data.purchase_price,
+      supplier: data.supplier || 'не указан',
+      manufacturing_date: data.manufacturing_date || 'не указана',
+      expiry_date: data.expiry_date || 'не указана',
+    });
+
+    return api.post(endpoint, data).then(response => {
+      console.log('✅ [ADD BATCH RESPONSE]');
+      console.log('📦 Response data:', JSON.stringify(response.data, null, 2));
+      return response;
+    }).catch(error => {
+      console.error('❌ [ADD BATCH ERROR]');
+      console.error('Error details:', error.response?.data || error.message);
+      throw error;
+    });
+  },
 };
