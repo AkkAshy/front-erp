@@ -102,23 +102,9 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
     setVariants(variants.filter((v) => v.id !== variantId));
   }
 
-  function updateVariantAttribute(
-    variantId: string,
-    attributeId: number,
-    valueId: number
-  ) {
-    setVariants(
-      variants.map((v) =>
-        v.id === variantId
-          ? { ...v, attributes: { ...v.attributes, [attributeId]: valueId } }
-          : v
-      )
-    );
-  }
-
   function updateVariantField(
     variantId: string,
-    field: "quantity" | "costPrice" | "salePrice" | "priceOverride",
+    field: "quantity" | "priceOverride",
     value: string
   ) {
     setVariants(
@@ -156,28 +142,25 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
       return;
     }
 
-    // Если есть варианты - проверяем их (используем цены из основной формы если не заполнены)
+    // Если есть варианты - проверяем их
     if (variants.length > 0) {
-      // Проверяем основные цены только если они будут использоваться как fallback
-      const hasVariantWithoutPrices = variants.some(
-        v => !v.costPrice || !v.salePrice || !v.quantity
-      );
+      // Проверяем что у всех вариантов заполнено количество
+      const hasVariantWithoutQuantity = variants.some(v => !v.quantity);
 
-      if (hasVariantWithoutPrices) {
-        if (!costPrice || costPrice === "0") {
-          setError("Kelish narxini kiriting (kerakli variantlar uchun)");
-          return;
-        }
+      if (hasVariantWithoutQuantity) {
+        setError("Barcha variantlar uchun miqdorni kiriting");
+        return;
+      }
 
-        if (!salePrice || salePrice === "0") {
-          setError("Sotish narxini kiriting (kerakli variantlar uchun)");
-          return;
-        }
+      // Проверяем основные цены (они используются для всех вариантов)
+      if (!costPrice || costPrice === "0") {
+        setError("Kelish narxini kiriting");
+        return;
+      }
 
-        if (!quantity || Number(quantity) <= 0) {
-          setError("Miqdorni kiriting (kerakli variantlar uchun)");
-          return;
-        }
+      if (!salePrice || salePrice === "0") {
+        setError("Sotish narxini kiriting");
+        return;
       }
 
       // Проверка каждого варианта
