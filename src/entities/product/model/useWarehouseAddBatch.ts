@@ -4,7 +4,6 @@ import { productApi } from "../api/productApi";
 type WarehouseAddBatchRequest = {
   type: "variant" | "product";
   id: number;
-  batch_number: string;
   quantity: number;
   purchase_price: number;
   supplier?: number;

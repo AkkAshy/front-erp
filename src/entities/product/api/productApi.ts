@@ -174,7 +174,6 @@ export const productApi = {
   warehouseAddBatch: (data: {
     type: "variant" | "product";
     id: number;
-    batch_number: string;
     quantity: number;
     purchase_price: number;
     supplier?: number;

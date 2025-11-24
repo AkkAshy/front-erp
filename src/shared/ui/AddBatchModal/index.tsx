@@ -13,7 +13,6 @@ type Props = {
 };
 
 const AddBatchModal: FC<Props> = ({ isOpen, onClose, scanType, scanData, onSuccess }) => {
-  const [batchNumber, setBatchNumber] = useState("");
   const [quantity, setQuantity] = useState("");
   const [purchasePrice, setPurchasePrice] = useState("");
   const [supplier, setSupplier] = useState("");
@@ -40,11 +39,6 @@ const AddBatchModal: FC<Props> = ({ isOpen, onClose, scanType, scanData, onSucce
     setError("");
 
     // Валидация
-    if (!batchNumber.trim()) {
-      setError("Partiya raqamini kiriting");
-      return;
-    }
-
     if (!quantity || Number(quantity) <= 0) {
       setError("Miqdorni kiriting");
       return;
@@ -64,7 +58,6 @@ const AddBatchModal: FC<Props> = ({ isOpen, onClose, scanType, scanData, onSucce
       await addBatch.mutateAsync({
         type: scanType,
         id: scanData.id,
-        batch_number: batchNumber,
         quantity: Number(quantity),
         purchase_price: Number(purchasePrice),
         supplier: supplier ? Number(supplier) : undefined,
@@ -73,7 +66,6 @@ const AddBatchModal: FC<Props> = ({ isOpen, onClose, scanType, scanData, onSucce
       });
 
       // Успех - очищаем форму и закрываем модал
-      setBatchNumber("");
       setQuantity("");
       setPurchasePrice("");
       setSupplier("");
@@ -93,7 +85,6 @@ const AddBatchModal: FC<Props> = ({ isOpen, onClose, scanType, scanData, onSucce
   };
 
   const handleClose = () => {
-    setBatchNumber("");
     setQuantity("");
     setPurchasePrice("");
     setSupplier("");
@@ -138,17 +129,6 @@ const AddBatchModal: FC<Props> = ({ isOpen, onClose, scanType, scanData, onSucce
         {error && <div className={styles.error}>{error}</div>}
 
         <div className={styles.form}>
-          <div className={styles.formGroup}>
-            <label>Partiya raqami *</label>
-            <input
-              type="text"
-              value={batchNumber}
-              onChange={(e) => setBatchNumber(e.target.value)}
-              placeholder="Partiya raqamini kiriting"
-              disabled={addBatch.isPending}
-            />
-          </div>
-
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label>Miqdor *</label>
