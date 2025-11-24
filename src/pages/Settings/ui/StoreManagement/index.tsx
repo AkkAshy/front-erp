@@ -107,7 +107,7 @@ const StoreManagement = () => {
 
       {/* Список магазинов */}
       <div className={styles.storesList}>
-        <h4>Mening do'konlarim ({myStores.data?.count || 0})</h4>
+        <h4>Mening do'konlarim ({myStores.data?.data?.count || 0})</h4>
 
         {myStores.isLoading && (
           <div className={styles.loading}>Yuklanmoqda...</div>
@@ -119,7 +119,7 @@ const StoreManagement = () => {
           </div>
         )}
 
-        {myStores.data?.stores && myStores.data.stores.length === 0 && (
+        {myStores.data?.data?.stores && myStores.data.data.stores.length === 0 && (
           <div className={styles.emptyState}>
             <img src="/empty.svg" alt="Bo'sh" />
             <p>Hali do'konlar yo'q</p>
@@ -127,9 +127,9 @@ const StoreManagement = () => {
           </div>
         )}
 
-        {myStores.data?.stores && myStores.data.stores.length > 0 && (
+        {myStores.data?.data?.stores && myStores.data.data.stores.length > 0 && (
           <div className={styles.storesGrid}>
-            {myStores.data.stores.map((store) => (
+            {myStores.data.data.stores.map((store) => (
               <div key={store.id} className={styles.storeCard}>
                 <div className={styles.storeCard__header}>
                   <h5>{store.name}</h5>

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { taskApi } from "../api/taskApi";
-import type { CreateTaskRequest } from "../api/taskTypes";
+import type { CreateTaskRequest, TasksResponse, Task, TaskDetail } from "../api/taskTypes";
 
 // Query keys
 export const taskKeys = {
@@ -22,55 +22,55 @@ export const useGetTasks = (params?: {
   assigned_to?: number;
   search?: string;
 }) => {
-  return useQuery({
+  return useQuery<TasksResponse>({
     queryKey: taskKeys.list(params),
     queryFn: async () => {
       const response = await taskApi.getAllTasks(params);
-      return response.data;
+      return response;
     },
   });
 };
 
 // Get my tasks
 export const useGetMyTasks = () => {
-  return useQuery({
+  return useQuery<Task[]>({
     queryKey: taskKeys.myTasks(),
     queryFn: async () => {
       const response = await taskApi.getMyTasks();
-      return response.data;
+      return response;
     },
   });
 };
 
 // Get overdue tasks
 export const useGetOverdueTasks = () => {
-  return useQuery({
+  return useQuery<Task[]>({
     queryKey: taskKeys.overdue(),
     queryFn: async () => {
       const response = await taskApi.getOverdueTasks();
-      return response.data;
+      return response;
     },
   });
 };
 
 // Get today's tasks
 export const useGetTodayTasks = () => {
-  return useQuery({
+  return useQuery<Task[]>({
     queryKey: taskKeys.today(),
     queryFn: async () => {
       const response = await taskApi.getTodayTasks();
-      return response.data;
+      return response;
     },
   });
 };
 
 // Get task detail
 export const useGetTask = (id: number) => {
-  return useQuery({
+  return useQuery<TaskDetail>({
     queryKey: taskKeys.detail(id),
     queryFn: async () => {
       const response = await taskApi.getTask(id);
-      return response.data;
+      return response;
     },
     enabled: !!id,
   });

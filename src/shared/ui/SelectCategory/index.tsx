@@ -31,19 +31,19 @@ const SelectCategory: FC<Props> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const categoryData = useCategories();
-  const selectedCategory = categoryData?.data?.results?.find(
-    (item) => item.id === categoryId
+  const selectedCategory = categoryData?.data?.data?.results?.find(
+    (item: { id: number | string }) => item.id === categoryId
   );
 
   // Filter categories based on search query
   const filteredCategories = useMemo(() => {
-    if (!categoryData?.data?.results) return [];
-    if (!searchQuery.trim()) return categoryData.data.results;
+    if (!categoryData?.data?.data?.results) return [];
+    if (!searchQuery.trim()) return categoryData.data.data.results;
 
-    return categoryData.data.results.filter((item) =>
+    return categoryData.data.data.results.filter((item: { name: string }) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [categoryData?.data?.results, searchQuery]);
+  }, [categoryData?.data?.data?.results, searchQuery]);
 
   return (
     <>
@@ -93,7 +93,7 @@ const SelectCategory: FC<Props> = ({
             </li>
           )}
           {filteredCategories.length > 0 ? (
-            filteredCategories.map((item) => (
+            filteredCategories.map((item: { id: number; name: string }) => (
               <li
                 key={item.id}
                 className={clsx(

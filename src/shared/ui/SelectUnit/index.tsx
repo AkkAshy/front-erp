@@ -28,19 +28,19 @@ const SelectUnit: FC<Props> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const unitData = useUnits();
-  const selectedUnit = unitData?.data?.results?.find(
-    (item) => item.id === unitId
+  const selectedUnit = unitData?.data?.data?.results?.find(
+    (item: { id: number | string }) => item.id === unitId
   );
 
   // Filter units based on search query
   const filteredUnits = useMemo(() => {
-    if (!unitData?.data?.results) return [];
-    if (!searchQuery.trim()) return unitData.data.results;
+    if (!unitData?.data?.data?.results) return [];
+    if (!searchQuery.trim()) return unitData.data.data.results;
 
-    return unitData.data.results.filter((item) =>
+    return unitData.data.data.results.filter((item: { display_name: string }) =>
       item.display_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [unitData?.data?.results, searchQuery]);
+  }, [unitData?.data?.data?.results, searchQuery]);
 
   return (
     <>
@@ -89,7 +89,7 @@ const SelectUnit: FC<Props> = ({
             </li>
           )}
           {filteredUnits.length > 0 ? (
-            filteredUnits.map((item) => (
+            filteredUnits.map((item: { id: number; display_name: string }) => (
               <li
                 key={item.id}
                 className={clsx(

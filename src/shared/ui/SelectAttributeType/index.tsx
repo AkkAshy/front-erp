@@ -33,13 +33,13 @@ const SelectAttributeType: FC<Props> = ({
 
   // Фильтруем по доступным ID, если они указаны
   const filteredAttributeTypes = availableIds && availableIds.length > 0
-    ? attributeTypesData?.data?.results.filter((item) =>
+    ? attributeTypesData?.results?.filter((item: { id: number }) =>
         availableIds.includes(item.id)
       )
-    : attributeTypesData?.data?.results;
+    : attributeTypesData?.results;
 
   const selectedAttributeType = filteredAttributeTypes?.find(
-    (item) => item.id === attributeTypeId
+    (item: { id: number | string }) => item.id === attributeTypeId
   );
 
   return (
@@ -79,7 +79,7 @@ const SelectAttributeType: FC<Props> = ({
       >
         {filteredAttributeTypes &&
         filteredAttributeTypes.length > 0 ? (
-          filteredAttributeTypes.map((item) => (
+          filteredAttributeTypes.map((item: { id: number; name: string }) => (
             <li
               key={item.id}
               className={clsx(

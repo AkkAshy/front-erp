@@ -163,11 +163,11 @@ const Sidebar = () => {
         <div className={styles.profile__info}>
           <p className={styles.profile__role}>
             {mapRole.find(
-              (item) => item.role === profile.data?.data?.data?.employee?.role
+              (item) => item.role === profile.data?.data?.employee?.role
             )?.label ?? "role"}
           </p>
           <p className={styles.profile__name}>
-            {profile.data?.data?.data?.user?.first_name || "profile"}
+            {profile.data?.data?.user?.first_name || "profile"}
           </p>
         </div>
       </div>

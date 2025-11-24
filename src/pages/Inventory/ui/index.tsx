@@ -92,7 +92,7 @@ const Inventory = () => {
     }
   }, [scanBarcode.data?.status, scannedCode]);
 
-  console.log(lowStock.data?.data);
+  console.log(lowStock.data);
 
   return (
     <div

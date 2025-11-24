@@ -35,9 +35,9 @@ const Profile = () => {
   const inputRef = useMask(maskOptions);
 
   useEffect(() => {
-    if (profile.data?.data?.data) {
-      // AxiosResponse -> ProfileResponse -> data -> user/store/employee
-      const userData = profile.data.data.data;
+    if (profile.data?.data) {
+      // ProfileResponse -> data -> user/store/employee
+      const userData = profile.data.data;
       setName(userData.user?.first_name || "");
       setSurname(userData.user?.last_name || "");
 
@@ -97,20 +97,20 @@ const Profile = () => {
 
           <div className={styles.profile__info}>
             <p className={styles.profile__name}>
-              {profile.data?.data?.data?.user?.full_name ||
-               `${profile.data?.data?.data?.user?.first_name || ''} ${profile.data?.data?.data?.user?.last_name || ''}`}
+              {profile.data?.data?.user?.full_name ||
+               `${profile.data?.data?.user?.first_name || ''} ${profile.data?.data?.user?.last_name || ''}`}
             </p>
             <span className={styles.profile__phone}>
-              {formatUzPhone(profile.data?.data?.data?.employee?.phone)}
+              {formatUzPhone(profile.data?.data?.employee?.phone)}
             </span>
-            {profile.data?.data?.data?.user?.email && (
+            {profile.data?.data?.user?.email && (
               <span className={styles.profile__email}>
-                {profile.data?.data?.data?.user?.email}
+                {profile.data?.data?.user?.email}
               </span>
             )}
-            {profile.data?.data?.data?.employee?.role_display && (
+            {profile.data?.data?.employee?.role_display && (
               <span className={styles.profile__role}>
-                {profile.data?.data?.data?.employee?.role_display}
+                {profile.data?.data?.employee?.role_display}
               </span>
             )}
           </div>

@@ -30,8 +30,8 @@ const Barcode = () => {
   const [storeName, setStoreName] = useState<string>("Magazin");
 
   useEffect(() => {
-    // Используем название магазина из профиля (AxiosResponse -> ProfileResponse -> data -> store -> name)
-    const store = profileInfo.data?.data?.data?.store;
+    // Используем название магазина из профиля (ProfileResponse -> data -> store -> name)
+    const store = profileInfo.data?.data?.store;
     if (store?.name) {
       setStoreName(store.name);
     }
