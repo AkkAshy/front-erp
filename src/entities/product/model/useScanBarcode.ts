@@ -1,6 +1,5 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { productApi } from "../api/productApi";
-import type { ProductItem } from "../api/types";
 
 // Новый warehouse scan API response
 export type VariantScanData = {

@@ -105,11 +105,14 @@ const Home = () => {
 
   // Когда товар найден по barcode, добавляем его в продажу
   useEffect(() => {
-    // ИСПРАВЛЕНО: Backend возвращает товар напрямую в data, а не в data.product
-    const product = scanBarcode.data?.data;
+    // Новый warehouse scan API возвращает status: "found" | "not_found"
+    const scanResult = scanBarcode.data;
+    const product = scanResult?.status === "found" ? scanResult.data : null;
 
     console.log('🔎 Barcode scan effect triggered:', {
       hasProduct: !!product,
+      scanStatus: scanResult?.status,
+      scanType: scanResult?.type,
       product: product,
       sessionId,
       scannedCode,
@@ -117,11 +120,16 @@ const Home = () => {
       isLoading: scanBarcode.isLoading
     });
 
-    if (product && sessionId && scannedCode) {
+    if (product && sessionId && scannedCode && scanResult?.status === "found") {
+      // Получаем имя в зависимости от типа (variant или product)
+      const productName = scanResult.type === "variant"
+        ? (product as any).display_name
+        : (product as any).name;
+
       console.log('🛒 Product found, adding to sale:', {
         sessionId,
         productId: product.id,
-        productName: product.name,
+        productName,
         barcode: scannedCode
       });
 
