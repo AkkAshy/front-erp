@@ -79,11 +79,21 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
   }
 
   // Функции для работы с вариантами
+
+  // Вычисляем оставшееся количество
+  function getRemainingQuantity(): number {
+    const totalQuantity = Number(quantity) || 0;
+    const usedQuantity = variants.reduce((sum, v) => sum + (Number(v.quantity) || 0), 0);
+    return Math.max(0, totalQuantity - usedQuantity);
+  }
+
   function addVariant() {
+    const remainingQty = getRemainingQuantity();
+
     const newVariant: Variant = {
       id: Date.now().toString(),
       attributes: {},
-      quantity: quantity || "", // Автоматически заполняем из основной формы
+      quantity: remainingQty > 0 ? String(remainingQty) : "", // Автоматически заполняем оставшееся количество
       priceOverride: "", // Пустое по умолчанию (будет использоваться цена родителя)
       selectedAttributeId: null,
     };
@@ -107,6 +117,34 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
     field: "quantity" | "priceOverride",
     value: string
   ) {
+    // Валидация для количества
+    if (field === "quantity") {
+      const newQuantity = Number(value) || 0;
+      const totalQuantity = Number(quantity) || 0;
+
+      // Считаем сколько уже использовано (без текущего варианта)
+      const usedByOthers = variants
+        .filter(v => v.id !== variantId)
+        .reduce((sum, v) => sum + (Number(v.quantity) || 0), 0);
+
+      const available = totalQuantity - usedByOthers;
+
+      // Если пытается ввести больше доступного - ограничиваем
+      if (newQuantity > available) {
+        setError(`Maksimum mavjud: ${available}. Umumiy miqdor: ${totalQuantity}`);
+        // Устанавливаем максимально доступное значение
+        value = String(available);
+
+        // Очищаем ошибку через 3 секунды
+        setTimeout(() => setError(""), 3000);
+      } else {
+        // Очищаем ошибку если значение корректное
+        if (error.includes("Maksimum mavjud")) {
+          setError("");
+        }
+      }
+    }
+
     setVariants(
       variants.map((v) => (v.id === variantId ? { ...v, [field]: value } : v))
     );
@@ -149,6 +187,20 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
 
       if (hasVariantWithoutQuantity) {
         setError("Barcha variantlar uchun miqdorni kiriting");
+        return;
+      }
+
+      // Проверяем что сумма количеств вариантов не превышает общее количество
+      const totalQuantity = Number(quantity) || 0;
+      const usedQuantity = variants.reduce((sum, v) => sum + (Number(v.quantity) || 0), 0);
+
+      if (usedQuantity > totalQuantity) {
+        setError(`Variantlar miqdori jami miqdordan oshib ketdi: ${usedQuantity} > ${totalQuantity}`);
+        return;
+      }
+
+      if (usedQuantity < totalQuantity) {
+        setError(`Barcha miqdor tarqatilmagan: ${usedQuantity} / ${totalQuantity}. Qolgan: ${totalQuantity - usedQuantity}`);
         return;
       }
 
@@ -469,20 +521,39 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
         {/* Динамические атрибуты (варианты) */}
         <div style={{ marginTop: '32px', borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>Variantlar (Atributlar)</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>Variantlar (Atributlar)</h3>
+              {variants.length > 0 && Number(quantity) > 0 && (
+                <div style={{
+                  padding: '6px 12px',
+                  background: '#dcfce7',
+                  color: '#16a34a',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: 500
+                }}>
+                  {getRemainingQuantity() === 0
+                    ? '✓ Barcha miqdor tarqatilgan'
+                    : `✓ Qolgan: ${getRemainingQuantity()} / ${quantity}`
+                  }
+                </div>
+              )}
+            </div>
             <button
               type="button"
               onClick={addVariant}
+              disabled={!quantity || Number(quantity) === 0}
               style={{
                 padding: '8px 16px',
-                background: '#8E51FF',
+                background: (!quantity || Number(quantity) === 0) ? '#cbd5e1' : '#8E51FF',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
-                cursor: 'pointer',
+                cursor: (!quantity || Number(quantity) === 0) ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
                 fontWeight: 500
               }}
+              title={(!quantity || Number(quantity) === 0) ? 'Avval umumiy miqdorni kiriting' : ''}
             >
               + Variant qo'shish
             </button>
@@ -620,13 +691,53 @@ const CreateProduct: FC<Props> = ({ isOpenCreate, setIsOpenCreate }) => {
               {/* Количество и переопределенная цена */}
               <div className={styles.price__wrapper}>
                 <div className={styles.input__wrapper}>
-                  <p className={styles.label__input}>Miqdor *</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <p className={styles.label__input} style={{ margin: 0 }}>Miqdor *</p>
+                    {Number(quantity) > 0 && getRemainingQuantity() === 0 && (
+                      <span style={{
+                        fontSize: '12px',
+                        color: '#16a34a',
+                        fontWeight: 500
+                      }}>
+                        ✓ Barcha miqdor tarqatilgan
+                      </span>
+                    )}
+                    {Number(quantity) > 0 && getRemainingQuantity() > 0 && (
+                      <span style={{
+                        fontSize: '12px',
+                        color: '#16a34a',
+                        fontWeight: 500
+                      }}>
+                        ✓ Qoldi: {getRemainingQuantity()}
+                      </span>
+                    )}
+                  </div>
                   <input
                     value={variant.quantity}
                     onChange={(e) => updateVariantField(variant.id, "quantity", e.target.value)}
                     type="number"
                     placeholder="0"
+                    min="0"
+                    max={(() => {
+                      const usedByOthers = variants
+                        .filter(v => v.id !== variant.id)
+                        .reduce((sum, v) => sum + (Number(v.quantity) || 0), 0);
+                      return Number(quantity) - usedByOthers;
+                    })()}
                     onWheel={handleWheel}
+                    style={{
+                      borderColor: (() => {
+                        const variantQty = Number(variant.quantity) || 0;
+                        const usedByOthers = variants
+                          .filter(v => v.id !== variant.id)
+                          .reduce((sum, v) => sum + (Number(v.quantity) || 0), 0);
+                        const available = Number(quantity) - usedByOthers;
+
+                        if (variantQty > available) return '#ef4444'; // Red - exceeds available
+                        if (variantQty > 0 && variantQty <= available) return '#16a34a'; // Green - valid quantity
+                        return undefined; // Default - empty or 0
+                      })()
+                    }}
                   />
                 </div>
                 <div className={styles.input__wrapper}>
