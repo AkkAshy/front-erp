@@ -428,7 +428,7 @@ const Home = () => {
               </p>
               <CashierSelector
                 onSelect={setSelectedCashier}
-                selectedCashierId={selectedCashier?.id}
+                selectedCashierId={selectedCashier?.id ?? null}
               />
             </div>
 

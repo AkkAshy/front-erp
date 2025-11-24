@@ -14,13 +14,17 @@ const CashierSelector: FC<Props> = ({ onSelect, selectedCashierId }) => {
 
   // Синхронизация с родительским компонентом через selectedCashierId
   useEffect(() => {
+    console.log('🔄 CashierSelector useEffect - selectedCashierId:', selectedCashierId);
+
     if (selectedCashierId === null) {
       // Если selectedCashierId явно null, сбрасываем выбор
+      console.log('✅ Resetting cashier to null');
       setSelectedCashier(null);
     } else if (selectedCashierId && cashiersData?.data) {
       // Если передан конкретный ID, находим и устанавливаем кассира
       const cashier = cashiersData.data.find((c) => c.id === selectedCashierId);
       if (cashier) {
+        console.log('✅ Setting cashier:', cashier.full_name);
         setSelectedCashier(cashier);
       }
     }
