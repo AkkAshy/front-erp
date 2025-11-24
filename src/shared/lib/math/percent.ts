@@ -2,11 +2,11 @@ export function percentGrowth(today: number, yesterday: number): string {
   // оба ноль → нет роста
   if (yesterday === 0 && today === 0) return "0%";
 
-  // если вчера не было, а сегодня есть → бесконечный рост
-  if (yesterday === 0 && today > 0) return "+∞%";
+  // если вчера не было, а сегодня есть → показываем +100% вместо бесконечности
+  if (yesterday === 0 && today > 0) return "+100%";
 
   // если вчера не было, а сегодня меньше нуля (теоретически убытки)
-  if (yesterday === 0 && today < 0) return "-∞%";
+  if (yesterday === 0 && today < 0) return "-100%";
 
   // если какое-то значение не число → 0%
   if (!Number.isFinite(today) || !Number.isFinite(yesterday)) return "0%";
