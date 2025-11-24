@@ -185,7 +185,12 @@ export type Sale = {
     id: number;
     product: number;
     product_name: string;
+    product_sku?: string;
     batch?: number;
+    batch_number?: string;
+    variant?: number;
+    variant_sku?: string;
+    variant_barcode?: string;
     quantity: string;
     unit_price: string;
     discount_amount: string;

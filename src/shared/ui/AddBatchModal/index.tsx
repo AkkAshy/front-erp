@@ -98,7 +98,8 @@ const AddBatchModal: FC<Props> = ({ isOpen, onClose, scanType, scanData, onSucce
     <CreateModal
       isOpen={isOpen}
       onClose={handleClose}
-      width={600}
+      width={700}
+      height={650}
       headTitle="Partiya qo'shish"
       btnTitle="Qo'shish"
       btnOnClick={handleSubmit}

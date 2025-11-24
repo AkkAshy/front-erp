@@ -290,8 +290,8 @@ const Home = () => {
           setShowSuccessNotification(true);
           // Clear customer selection after successful checkout
           setSelectedCustomer(null);
-          // НЕ сбрасываем кассира - он должен остаться выбранным для следующих продаж
-          // setSelectedCashier(null);
+          // Сбрасываем кассира после каждой продажи
+          setSelectedCashier(null);
         },
         onError: (error: any) => {
           setErrorMessage(error?.response?.data?.message || "Xatolik yuz berdi");
@@ -348,12 +348,19 @@ const Home = () => {
 
         <Table
           headCols={headCols}
-          bodyCols={items.slice(offset, offset + limit).map((item: { id: number; product_name: string; quantity: string; unit_price: string }, index: number) => ({
+          bodyCols={items.slice(offset, offset + limit).map((item: {
+            id: number;
+            product_name: string;
+            product_sku?: string;
+            variant_sku?: string;
+            quantity: string;
+            unit_price: string
+          }, index: number) => ({
             id: item.id,
             index: index + 1 + offset,
             category_name: "-", // Category name not included in sale item
             name: item.product_name,
-            sku: "-", // SKU not included in sale item
+            sku: item.variant_sku || item.product_sku || "-", // Показываем variant_sku если есть, иначе product_sku, иначе "-"
             unit: "-", // Unit not included in sale item
             quantity: `${(parseFloat(item.quantity) || 0).toFixed(0)}x`,
             sale_price: ((+item.unit_price) || 0).toLocaleString("de-DE") + " uzs",
