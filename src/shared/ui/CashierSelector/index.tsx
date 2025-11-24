@@ -12,8 +12,13 @@ const CashierSelector: FC<Props> = ({ onSelect, selectedCashierId }) => {
   const { data: cashiersData, isLoading, isError } = useCashiers();
   const [selectedCashier, setSelectedCashier] = useState<Cashier | null>(null);
 
-  // Restore selected cashier from localStorage on mount
+  // Restore selected cashier from localStorage on mount - ТОЛЬКО если не передан selectedCashierId
   useEffect(() => {
+    if (selectedCashierId !== undefined) {
+      // Если prop передан явно (даже null), не восстанавливаем из localStorage
+      return;
+    }
+
     const savedCashierId = localStorage.getItem("selectedCashierId");
     if (savedCashierId && cashiersData?.data) {
       const cashier = cashiersData.data.find(
@@ -21,13 +26,19 @@ const CashierSelector: FC<Props> = ({ onSelect, selectedCashierId }) => {
       );
       if (cashier) {
         setSelectedCashier(cashier);
+        onSelect(cashier); // Уведомляем родителя
       }
     }
-  }, [cashiersData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cashiersData, selectedCashierId]);
 
   // Update from props
   useEffect(() => {
-    if (selectedCashierId && cashiersData?.data) {
+    if (selectedCashierId === null || selectedCashierId === undefined) {
+      // Если selectedCashierId явно null, сбрасываем выбор
+      setSelectedCashier(null);
+      localStorage.removeItem("selectedCashierId");
+    } else if (selectedCashierId && cashiersData?.data) {
       const cashier = cashiersData.data.find((c) => c.id === selectedCashierId);
       if (cashier) {
         setSelectedCashier(cashier);
