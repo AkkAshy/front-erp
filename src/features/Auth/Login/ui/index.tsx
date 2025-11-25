@@ -12,6 +12,7 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const location = useLocation();
 
   const login = useLogin();
@@ -31,6 +32,35 @@ const LoginForm = () => {
           // Делаем полную перезагрузку страницы для обновления всех компонентов
           const from = location.state?.from || "/";
           window.location.href = from;
+        },
+        onError: (error: any) => {
+          console.error("Login error:", error);
+          // Извлекаем сообщение об ошибке с бэкенда
+          if (error.response?.data) {
+            const errorData = error.response.data;
+
+            // Если это объект с несколькими полями ошибок
+            if (typeof errorData === 'object' && !errorData.detail) {
+              const errorMessages = Object.entries(errorData)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(', ');
+              setErrorMessage(errorMessages);
+            }
+            // Если есть поле detail (стандартное для DRF)
+            else if (errorData.detail) {
+              setErrorMessage(errorData.detail);
+            }
+            // Если это просто строка
+            else if (typeof errorData === 'string') {
+              setErrorMessage(errorData);
+            }
+            // Fallback
+            else {
+              setErrorMessage("Login yoki parol noto'g'ri");
+            }
+          } else {
+            setErrorMessage("Tarmoq xatosi. Iltimos, qaytadan urinib ko'ring.");
+          }
         },
       }
     );
@@ -102,7 +132,7 @@ const LoginForm = () => {
 
       <Notification
         message="Xatolik"
-        description="Login yoki parol noto'g'ri"
+        description={errorMessage || "Login yoki parol noto'g'ri"}
         onOpen={login.isError}
         type="error"
       />

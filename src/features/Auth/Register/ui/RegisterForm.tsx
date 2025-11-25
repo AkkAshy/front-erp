@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useRegister } from "../api/useRegister";
 import Loader from "@/shared/ui/Loader";
+import Notification from "@/shared/ui/Notification";
 import { HideIcon } from "@/shared/ui/icons";
 
 //scss
@@ -18,6 +19,8 @@ const maskOptions = {
 export const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showError, setShowError] = useState(false);
   const location = useLocation();
   const register = useRegister();
 
@@ -46,6 +49,10 @@ export const RegisterForm = () => {
   const storePhoneRef = useMask(maskOptions);
 
   const handleSubmit = () => {
+    // Сбрасываем предыдущие ошибки
+    setErrorMessage("");
+    setShowError(false);
+
     const normalizedPhone = normalizePhone(phone);
     const normalizedStorePhone = normalizePhone(storePhone);
 
@@ -60,19 +67,22 @@ export const RegisterForm = () => {
       !storeAddress ||
       !storePhone
     ) {
-      alert("Iltimos, barcha majburiy maydonlarni to'ldiring");
+      setErrorMessage("Iltimos, barcha majburiy maydonlarni to'ldiring");
+      setShowError(true);
       return;
     }
 
     // Валидация пароля
     if (password.length < 8) {
-      alert("Parol kamida 8 ta belgidan iborat bo'lishi kerak");
+      setErrorMessage("Parol kamida 8 ta belgidan iborat bo'lishi kerak");
+      setShowError(true);
       return;
     }
 
     // ⭐ Проверка совпадения паролей
     if (password !== passwordConfirm) {
-      alert("Parollar mos emas");
+      setErrorMessage("Parollar mos emas");
+      setShowError(true);
       return;
     }
 
@@ -105,15 +115,42 @@ export const RegisterForm = () => {
         },
         onError: (error: any) => {
           console.error("Registration error:", error);
-          // Показываем ошибки валидации с бэкенда
+          // Извлекаем сообщение об ошибке с бэкенда
           if (error.response?.data) {
-            const errors = error.response.data;
-            const errorMessages = Object.entries(errors)
-              .map(([key, value]) => `${key}: ${value}`)
-              .join("\n");
-            alert(`Ro'yxatdan o'tishda xatolik:\n${errorMessages}`);
+            const errorData = error.response.data;
+
+            // Если это объект с несколькими полями ошибок
+            if (typeof errorData === 'object' && !errorData.detail) {
+              const errorMessages = Object.entries(errorData)
+                .map(([key, value]) => {
+                  // Перевод ключей на узбекский для удобства
+                  const keyTranslations: Record<string, string> = {
+                    'username': 'Login',
+                    'password': 'Parol',
+                    'email': 'Email',
+                    'phone': 'Telefon',
+                    'store_name': "Do'kon nomi",
+                  };
+                  const translatedKey = keyTranslations[key] || key;
+                  return `${translatedKey}: ${value}`;
+                })
+                .join(', ');
+              setErrorMessage(errorMessages);
+            }
+            // Если есть поле detail (стандартное для DRF)
+            else if (errorData.detail) {
+              setErrorMessage(errorData.detail);
+            }
+            // Если это просто строка
+            else if (typeof errorData === 'string') {
+              setErrorMessage(errorData);
+            }
+            // Fallback
+            else {
+              setErrorMessage("Ro'yxatdan o'tishda xatolik yuz berdi");
+            }
           } else {
-            alert("Ro'yxatdan o'tishda xatolik yuz berdi");
+            setErrorMessage("Tarmoq xatosi. Iltimos, qaytadan urinib ko'ring.");
           }
         },
       }
@@ -380,6 +417,20 @@ export const RegisterForm = () => {
           </p>
         </div>
       </div>
+
+      <Notification
+        message="Muvaffaqiyat"
+        description="Siz muvaffaqiyatli ro'yxatdan o'tdingiz!"
+        onOpen={register.isSuccess}
+        type="success"
+      />
+
+      <Notification
+        message="Xatolik"
+        description={errorMessage || "Ro'yxatdan o'tishda xatolik yuz berdi"}
+        onOpen={register.isError || showError}
+        type="error"
+      />
     </div>
   );
 };
