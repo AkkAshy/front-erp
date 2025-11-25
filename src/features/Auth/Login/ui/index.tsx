@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useLogin } from "../api/useLogin";
 import Notification from "@/shared/ui/Notification";
 import Loader from "@/shared/ui/Loader";
@@ -13,7 +13,6 @@ const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const location = useLocation();
-  const navigate = useNavigate();
 
   const login = useLogin();
 
@@ -29,9 +28,9 @@ const LoginForm = () => {
       {
         onSuccess: () => {
           // Токены уже сохранены в sessionApi.login()
-          // Используем navigate для SPA редиректа
+          // Делаем полную перезагрузку страницы для обновления всех компонентов
           const from = location.state?.from || "/";
-          navigate(from, { replace: true });
+          window.location.href = from;
         },
       }
     );

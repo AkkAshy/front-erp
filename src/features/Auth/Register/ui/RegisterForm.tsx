@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useRegister } from "../api/useRegister";
 import Loader from "@/shared/ui/Loader";
 import { HideIcon } from "@/shared/ui/icons";
@@ -19,7 +19,6 @@ export const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
   const register = useRegister();
 
   // Личные данные
@@ -100,9 +99,9 @@ export const RegisterForm = () => {
       {
         onSuccess: () => {
           // ⭐ tenant_key уже сохранён в sessionApi.register()
-          // Токены уже сохранены, используем navigate для SPA редиректа
+          // Токены уже сохранены, делаем полную перезагрузку страницы для обновления всех компонентов
           const from = location.state?.from || "/";
-          navigate(from, { replace: true });
+          window.location.href = from;
         },
         onError: (error: any) => {
           console.error("Registration error:", error);
