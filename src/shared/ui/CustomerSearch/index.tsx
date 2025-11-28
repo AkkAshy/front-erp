@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { customersApi } from "@/entities/customer/api/customersApi";
 import type { Customer } from "@/entities/customer/api/types";
 import type { NewCustomerData } from "@/entities/sales/model/types";
+import { formatPhoneWithMask } from "@/shared/lib/utils/formatters";
 import styles from "./CustomerSearch.module.scss";
 
 interface CustomerSearchProps {
@@ -9,6 +10,7 @@ interface CustomerSearchProps {
   onCreateNew?: (customerData: NewCustomerData) => void;
   placeholder?: string;
   autoFocus?: boolean;
+  selectedCustomer?: Customer | null;
 }
 
 export const CustomerSearch = ({
@@ -16,6 +18,7 @@ export const CustomerSearch = ({
   onCreateNew,
   placeholder = "Telefon raqamni kiriting (+998...)",
   autoFocus = false,
+  selectedCustomer: externalSelectedCustomer,
 }: CustomerSearchProps) => {
   const [phone, setPhone] = useState("+998");
   const [isSearching, setIsSearching] = useState(false);
@@ -23,6 +26,18 @@ export const CustomerSearch = ({
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [notFound, setNotFound] = useState(false);
+
+  // Sync with external selected customer
+  useEffect(() => {
+    if (externalSelectedCustomer !== undefined) {
+      setSelectedCustomer(externalSelectedCustomer);
+      if (externalSelectedCustomer) {
+        setPhone(formatPhoneWithMask(externalSelectedCustomer.phone));
+        setShowResults(false);
+        setNotFound(false);
+      }
+    }
+  }, [externalSelectedCustomer]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -51,11 +66,15 @@ export const CustomerSearch = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Debounce timeout ref
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Search customers by phone
   const searchByPhone = async (phoneValue: string) => {
     console.log("🔍 Searching for phone:", phoneValue);
 
-    if (phoneValue.length < 13) {
+    // Минимум 7 символов (+998 + 3 цифры) для поиска
+    if (phoneValue.length < 7) {
       console.log("❌ Phone too short:", phoneValue.length);
       setCustomers([]);
       setNotFound(false);
@@ -114,15 +133,32 @@ export const CustomerSearch = ({
 
     setPhone(value);
 
-    // Auto-search when user types
-    if (value.length >= 13) {
-      searchByPhone(value);
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Auto-search when user types (минимум 3 цифры после +998)
+    if (value.length >= 7) {
+      // Debounce: ждем 300мс после последнего ввода
+      searchTimeoutRef.current = setTimeout(() => {
+        searchByPhone(value);
+      }, 300);
     } else {
       setCustomers([]);
       setNotFound(false);
       setShowResults(false);
     }
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Select customer from dropdown
   const handleSelectCustomer = (customer: Customer) => {

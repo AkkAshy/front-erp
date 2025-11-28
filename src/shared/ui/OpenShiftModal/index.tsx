@@ -1,8 +1,8 @@
-import { useState, type FC } from "react";
-import CreateModal from "../CreateModal";
+import { useEffect, type FC } from "react";
+import { Modal } from "antd";
 import Notification from "../Notification";
 import { useOpenShift } from "@/entities/sales/model/useOpenShift";
-import styles from "./OpenShiftModal.module.scss";
+import { DEFAULT_OPENING_CASH } from "@/entities/sales/api/shiftTypes";
 
 type Props = {
   isOpen: boolean;
@@ -11,86 +11,49 @@ type Props = {
 };
 
 const OpenShiftModal: FC<Props> = ({ isOpen, onClose, onSuccess }) => {
-  const [openingBalance, setOpeningBalance] = useState("0");
-  const [error, setError] = useState("");
   const openShift = useOpenShift();
 
-  const handleOpen = () => {
-    const balance = parseFloat(openingBalance.replace(/\./g, "").replace(/,/g, "."));
-
-    if (isNaN(balance) || balance < 0) {
-      setError("Kiriting to'g'ri boshlang'ich balansni");
-      return;
-    }
-
-    openShift
-      .mutateAsync({ opening_balance: balance })
-      .then(() => {
-        setOpeningBalance("0");
-        setError("");
-        onClose();
-        onSuccess?.();
-      })
-      .catch((err) => {
-        console.error("Error opening shift:", err);
-        setError(err.response?.data?.non_field_errors?.[0] || "Smena ochishda xatolik");
+  useEffect(() => {
+    if (isOpen) {
+      Modal.confirm({
+        title: "Smenani ochish",
+        content: `Kassa ${DEFAULT_OPENING_CASH.toLocaleString("ru-RU")} uzs balans bilan ochiladi`,
+        okText: "Ochish",
+        cancelText: "Bekor qilish",
+        centered: true,
+        onOk: () => {
+          return openShift
+            .mutateAsync(undefined)
+            .then(() => {
+              onClose();
+              onSuccess?.();
+            })
+            .catch((err) => {
+              console.error("Error opening shift:", err);
+              const errorMsg = err.response?.data?.message ||
+                err.response?.data?.non_field_errors?.[0] ||
+                "Smena ochishda xatolik";
+              Modal.error({
+                title: "Xatolik",
+                content: errorMsg,
+                centered: true,
+              });
+            });
+        },
+        onCancel: () => {
+          onClose();
+        },
       });
-  };
-
-  const handleClose = () => {
-    setOpeningBalance("0");
-    setError("");
-    onClose();
-  };
+    }
+  }, [isOpen]);
 
   return (
     <>
-      <CreateModal
-        isOpen={isOpen}
-        onClose={handleClose}
-        headTitle="Smenani ochish"
-        btnTitle="Ochish"
-        btnClose={true}
-        width={500}
-        height={300}
-        btnWidth="100%"
-        btnHeight={56}
-        btnOnClick={handleOpen}
-      >
-        <div className={styles.container}>
-          <div className={styles.input__wrapper}>
-            <p className={styles.label}>Boshlang'ich balans</p>
-            <input
-              value={openingBalance}
-              onChange={(e) => {
-                const numericValue = e.target.value.replace(/\D/g, "");
-                const formattedValue = numericValue
-                  ? Number(numericValue).toLocaleString("de-DE")
-                  : "";
-                setOpeningBalance(formattedValue);
-              }}
-              type="text"
-              placeholder="0 uzs"
-              className={styles.input}
-            />
-          </div>
-
-          {error && <p className={styles.error}>{error}</p>}
-        </div>
-      </CreateModal>
-
       <Notification
         type="success"
         message="Muvaffaqiyat"
-        description="Smena ochildi"
+        description={`Smena ${DEFAULT_OPENING_CASH.toLocaleString("ru-RU")} uzs bilan ochildi`}
         onOpen={openShift.isSuccess}
-      />
-
-      <Notification
-        type="error"
-        message="Xatolik"
-        description={error || "Smena ochilmadi"}
-        onOpen={openShift.isError}
       />
     </>
   );

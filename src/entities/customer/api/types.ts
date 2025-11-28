@@ -113,3 +113,27 @@ export type CustomerStats = {
   bonus_balance: number;
   vip_status: boolean;
 };
+
+// ===== TOP CUSTOMERS TYPES =====
+
+export type TopCustomer = {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  phone: string;
+  total_purchases: number;
+  total_purchases_count: number;
+  loyalty_points: number;
+};
+
+export type TopCustomersOrderBy = "total_purchases" | "total_purchases_count" | "loyalty_points";
+
+export type TopCustomersResponse = {
+  status: "success";
+  data: TopCustomer[];
+  meta: {
+    limit: number;
+    order_by: TopCustomersOrderBy;
+    count: number;
+  };
+};

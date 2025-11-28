@@ -32,6 +32,7 @@ const sidebarItems = [
   { key: "history", title: "Tarix" },
   { key: "inventory", title: "Ombor" },
   { key: "tasks", title: "Vazifalar" },
+  { key: "referrals", title: "Referallar" },
   { key: "settings", title: "Sozlamalar" },
 ];
 
@@ -43,6 +44,7 @@ const iconsMap: Record<string, FC<IconProps>> = {
   history: HistoryIcon,
   inventory: InventoryIcon,
   tasks: TasksIcon,
+  referrals: CustomersIcon, // Using CustomersIcon for referrals
   settings: SettingsIcon,
 };
 
@@ -67,6 +69,15 @@ const mapRole: RoleItem[] = [
     label: "omborchi",
     role: "stockkeeper",
   },
+  {
+    label: "referal",
+    role: "referral",
+  },
+];
+
+// Sidebar items for referral role (only dashboard)
+const referralSidebarItems = [
+  { key: "referral-dashboard", title: "Dashboard" },
 ];
 
 const Sidebar = () => {
@@ -81,6 +92,13 @@ const Sidebar = () => {
   const location = useLocation();
   const currentPage =
     location.pathname === "/" ? "home" : location.pathname.split("/")[1];
+
+  // Get user role - use string comparison to avoid type issues
+  const userRole = profile.data?.data?.employee?.role as string | undefined;
+  const isReferral = userRole === "referral";
+
+  // Show different menu items based on role
+  const menuItems = isReferral ? referralSidebarItems : sidebarItems;
 
   return (
     <div className={clsx(styles.sidebar, isToggleSidebar && styles.close)}>
@@ -104,8 +122,8 @@ const Sidebar = () => {
 
       <div className={styles.sidebar__inner}>
         <ul className={styles.nav_list}>
-          {sidebarItems.map((item) => {
-            const Icon = iconsMap[item.key];
+          {menuItems.map((item) => {
+            const Icon = iconsMap[item.key] || StatisticsIcon;
             return (
               <li
                 key={item.key}

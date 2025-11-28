@@ -110,9 +110,39 @@
   }
 }
 
+.headerButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.withdrawButton {
+  padding: 8px 16px;
+  background-color: #8e51ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: #7c3aed;
+  }
+
+  &:active:not(:disabled) {
+    background-color: #6d28d9;
+  }
+
+  &:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+  }
+}
+
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 

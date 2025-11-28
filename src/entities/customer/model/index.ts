@@ -5,3 +5,4 @@ export { useUpdateCustomer } from "./useUpdateCustomer";
 export { useDeleteCustomer } from "./useDeleteCustomer";
 export { useCustomerStats } from "./useCustomerStats";
 export { usePurchaseHistory } from "./usePurchaseHistory";
+export { useTopCustomers } from "./useTopCustomers";

@@ -11,6 +11,8 @@ import Category from "@/pages/Settings/ui/Category";
 import MainSettings from "@/pages/Settings/ui/Main";
 import Seller from "@/pages/Settings/ui/Seller";
 import StoreManagement from "@/pages/Settings/ui/StoreManagement";
+import Referrals from "@/pages/Referrals/ui";
+import ReferralDashboard from "@/pages/ReferralDashboard/ui";
 
 import { RegisterForm } from "@/features/Auth/Register/ui/RegisterForm";
 
@@ -56,6 +58,14 @@ export const appRouter = createBrowserRouter([
           {
             path: "tasks",
             element: <Tasks />,
+          },
+          {
+            path: "referrals",
+            element: <Referrals />,
+          },
+          {
+            path: "referral-dashboard",
+            element: <ReferralDashboard />,
           },
           {
             path: "settings",

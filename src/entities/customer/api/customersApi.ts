@@ -1,5 +1,5 @@
 import { api } from "@/shared/api/base/client";
-import type { CreateCustomer, UpdateCustomer } from "./types";
+import type { CreateCustomer, UpdateCustomer, TopCustomersOrderBy } from "./types";
 
 export const customersApi = {
   // ===== CRUD OPERATIONS =====
@@ -56,6 +56,12 @@ export const customersApi = {
     offset?: number;
     limit?: number;
   }) => api.get("/customers/customers/vip_list/", { params }),
+
+  // Get top customers
+  getTopCustomers: (params?: {
+    limit?: number;
+    order_by?: TopCustomersOrderBy;
+  }) => api.get("/customers/customers/top/", { params }),
 
   // ===== CUSTOMER GROUPS =====
 

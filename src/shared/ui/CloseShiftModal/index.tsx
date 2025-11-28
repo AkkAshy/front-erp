@@ -4,6 +4,7 @@ import Notification from "../Notification";
 import { useCloseShift } from "@/entities/sales/model/useCloseShift";
 import { formatNumber } from "@/shared/lib/utils/formatters";
 import type { CashierShift } from "@/entities/sales/api/shiftTypes";
+import { DEFAULT_OPENING_CASH } from "@/entities/sales/api/shiftTypes";
 import styles from "./CloseShiftModal.module.scss";
 
 type Props = {
@@ -14,8 +15,7 @@ type Props = {
 };
 
 const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
-  const [closingBalance, setClosingBalance] = useState("");
-  const [notes, setNotes] = useState("");
+  const [shortage, setShortage] = useState("");
   const [error, setError] = useState("");
   const closeShift = useCloseShift();
 
@@ -23,10 +23,12 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
     if (!shift) return;
 
     // Убираем все пробелы и неразрывные пробелы, затем парсим
-    const balance = parseFloat(closingBalance.replace(/\s/g, "").replace(/\u00A0/g, ""));
+    const shortageAmount = shortage
+      ? parseFloat(shortage.replace(/\s/g, "").replace(/\u00A0/g, ""))
+      : 0;
 
-    if (!closingBalance || isNaN(balance) || balance < 0) {
-      setError("Kiriting to'g'ri yakuniy balansni");
+    if (shortage && (isNaN(shortageAmount) || shortageAmount < 0)) {
+      setError("To'g'ri summa kiriting");
       return;
     }
 
@@ -34,36 +36,34 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
       .mutateAsync({
         shiftId: shift.id,
         data: {
-          actual_cash: balance,
-          notes: notes || undefined,
+          shortage: shortageAmount,
         },
       })
       .then(() => {
-        setClosingBalance("");
-        setNotes("");
+        setShortage("");
         setError("");
         onClose();
         onSuccess?.();
       })
       .catch((err) => {
         console.error("Error closing shift:", err);
-        setError(err.response?.data?.error || "Smena yopishda xatolik");
+        setError(err.response?.data?.message || err.response?.data?.error || "Smena yopishda xatolik");
       });
   };
 
   const handleModalClose = () => {
-    setClosingBalance("");
-    setNotes("");
+    setShortage("");
     setError("");
     onClose();
   };
 
   if (!shift) return null;
 
-  const expectedBalance = parseFloat(shift.expected_cash) || 0;
-  const difference = closingBalance
-    ? (parseFloat(closingBalance.replace(/\s/g, "").replace(/\u00A0/g, "")) || 0) - expectedBalance
+  const expectedCash = parseFloat(shift.expected_cash) || 0;
+  const shortageAmount = shortage
+    ? parseFloat(shortage.replace(/\s/g, "").replace(/\u00A0/g, "")) || 0
     : 0;
+  const actualCash = expectedCash - shortageAmount;
 
   return (
     <>
@@ -84,7 +84,7 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
             <div className={styles.stat__item}>
               <span className={styles.stat__label}>Boshlang'ich balans:</span>
               <span className={styles.stat__value}>
-                {formatNumber(shift.opening_cash)} uzs
+                {formatNumber(Number(shift.opening_cash) || DEFAULT_OPENING_CASH)} uzs
               </span>
             </div>
 
@@ -110,7 +110,7 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
             </div>
 
             <div className={styles.stat__item}>
-              <span className={styles.stat__label}>Kutilayotgan balans:</span>
+              <span className={styles.stat__label}>Kassada bo'lishi kerak:</span>
               <span className={`${styles.stat__value} ${styles.expected}`}>
                 {formatNumber(shift.expected_cash)} uzs
               </span>
@@ -118,43 +118,43 @@ const CloseShiftModal: FC<Props> = ({ isOpen, onClose, shift, onSuccess }) => {
           </div>
 
           <div className={styles.input__wrapper}>
-            <p className={styles.label}>Faktik balans (kassada qancha pul bor)</p>
+            <p className={styles.label}>Kamomad (qancha pul yetmayapti)</p>
             <input
-              value={closingBalance}
+              value={shortage}
               onChange={(e) => {
                 const numericValue = e.target.value.replace(/\D/g, "");
                 const formattedValue = numericValue
                   ? Number(numericValue).toLocaleString("ru-RU")
                   : "";
-                setClosingBalance(formattedValue);
+                setShortage(formattedValue);
               }}
               type="text"
-              placeholder="0 uzs"
+              placeholder="0 uzs (hammasi to'g'ri bo'lsa)"
               className={styles.input}
             />
           </div>
 
-          {closingBalance && (
-            <div className={styles.difference}>
-              <span>Farq:</span>
-              <span
-                className={difference >= 0 ? styles.positive : styles.negative}
-              >
-                {difference >= 0 ? "+" : ""}
-                {formatNumber(difference)} uzs
+          <div className={styles.summary}>
+            <div className={styles.summaryItem}>
+              <span>Kutilayotgan summa:</span>
+              <span>{formatNumber(expectedCash)} uzs</span>
+            </div>
+            {shortageAmount > 0 && (
+              <div className={styles.summaryItem}>
+                <span>Kamomad:</span>
+                <span className={styles.negative}>-{formatNumber(shortageAmount)} uzs</span>
+              </div>
+            )}
+            <div className={`${styles.summaryItem} ${styles.total}`}>
+              <span>Faktik summa:</span>
+              <span className={shortageAmount > 0 ? styles.negative : ""}>
+                {formatNumber(actualCash)} uzs
               </span>
             </div>
-          )}
-
-          <div className={styles.input__wrapper}>
-            <p className={styles.label}>Izoh (ixtiyoriy)</p>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Izoh qoldiring..."
-              className={styles.textarea}
-              rows={3}
-            />
+            <div className={styles.summaryItem}>
+              <span>Keyingi smena uchun:</span>
+              <span>{formatNumber(DEFAULT_OPENING_CASH)} uzs</span>
+            </div>
           </div>
 
           {error && <p className={styles.error}>{error}</p>}

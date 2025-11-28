@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCreateCustomer } from "@/entities/customer/model";
 import type { Customer } from "@/entities/customer/api/types";
 import CreateModal from "@/shared/ui/CreateModal";
 import Notification from "@/shared/ui/Notification";
+import { formatPhoneWithMask, getCleanPhone, isValidPhone, parseApiError } from "@/shared/lib/utils/formatters";
 import styles from "./CreateCustomerModal.module.scss";
 
 interface CreateCustomerModalProps {
@@ -20,7 +21,7 @@ export const CreateCustomerModal = ({
 }: CreateCustomerModalProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState(initialPhone);
+  const [phone, setPhone] = useState(formatPhoneWithMask(initialPhone));
   const [email, setEmail] = useState("");
   const [customerType, setCustomerType] = useState<"individual" | "organization">("individual");
   const [organizationName, setOrganizationName] = useState("");
@@ -33,21 +34,23 @@ export const CreateCustomerModal = ({
 
   const createCustomer = useCreateCustomer();
 
+  // Reset error notification
+  useEffect(() => {
+    if (showError) {
+      const timer = setTimeout(() => setShowError(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showError]);
+
+  // Update phone when initialPhone changes
+  useEffect(() => {
+    if (initialPhone) {
+      setPhone(formatPhoneWithMask(initialPhone));
+    }
+  }, [initialPhone]);
+
   const handlePhoneChange = (value: string) => {
-    // Ensure phone always starts with +998
-    if (!value.startsWith("+998")) {
-      value = "+998";
-    }
-
-    // Remove non-digits except +
-    value = value.replace(/[^\d+]/g, "");
-
-    // Limit length to +998XXXXXXXXX (13 characters)
-    if (value.length > 13) {
-      value = value.slice(0, 13);
-    }
-
-    setPhone(value);
+    setPhone(formatPhoneWithMask(value));
   };
 
   const handleSubmit = () => {
@@ -58,8 +61,9 @@ export const CreateCustomerModal = ({
       return;
     }
 
-    if (phone.length !== 13) {
-      setErrorMessage("Telefon raqam noto'g'ri formatda (+998XXXXXXXXX)");
+    const cleanPhone = getCleanPhone(phone);
+    if (!isValidPhone(cleanPhone)) {
+      setErrorMessage("Telefon raqam noto'g'ri formatda (+998 XX XXX XX XX)");
       setShowError(true);
       return;
     }
@@ -75,7 +79,7 @@ export const CreateCustomerModal = ({
       {
         first_name: firstName.trim(),
         last_name: lastName.trim() || undefined,
-        phone: phone,
+        phone: cleanPhone,
         email: email.trim() || undefined,
         customer_type: customerType,
         organization_name: customerType === "organization" ? organizationName.trim() : undefined,
@@ -103,10 +107,7 @@ export const CreateCustomerModal = ({
           onClose();
         },
         onError: (error: any) => {
-          const message = error?.response?.data?.message ||
-                         error?.response?.data?.phone?.[0] ||
-                         "Xatolik yuz berdi";
-          setErrorMessage(message);
+          setErrorMessage(parseApiError(error));
           setShowError(true);
         },
       }
@@ -198,7 +199,7 @@ export const CreateCustomerModal = ({
               type="tel"
               value={phone}
               onChange={(e) => handlePhoneChange(e.target.value)}
-              placeholder="+998XXXXXXXXX"
+              placeholder="+998 XX XXX XX XX"
               className={styles.input}
               disabled={createCustomer.isPending}
             />

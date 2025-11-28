@@ -213,3 +213,28 @@ export type Product = {
   previous: string | null;
   results: ProductItem[];
 };
+
+// ===== TOP PRODUCTS TYPES =====
+
+export type TopProduct = {
+  product_id: number;
+  product_name: string;
+  product_sku: string;
+  total_revenue: string;
+  total_quantity: string;
+  total_profit: string;
+  sales_count: number;
+  percentage: number;
+};
+
+export type TopProductsResponse = {
+  period: {
+    start_date: string;
+    end_date: string;
+  };
+  total_quantity_sold: number;
+  top_products: TopProduct[];
+  tenant_key: string;
+  store_name: string;
+  store_slug: string;
+};
